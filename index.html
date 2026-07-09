@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurant Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --dashboard-blue: #1d4ed8;
+      --dashboard-blue-dark: #0f172a;
+      --dashboard-blue-soft: #eff6ff;
+      --dashboard-gold: #f59e0b;
+      --dashboard-border: #dbeafe;
+      --dashboard-text: #334155;
+      --dashboard-surface: #f8fbff;
+      --dashboard-card: #ffffff;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+      color: var(--dashboard-text);
+      padding-bottom: 0;
+    }
+
+    .navbar-custom {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--dashboard-border);
+      padding: 1rem 0;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .container-fluid,
+    .container {
+      max-width: 1480px;
+    }
+    .navbar-custom .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dashboard-blue-dark);
+      margin-right: 2rem;
+    }
+    .navbar-custom .navbar-brand span {
+      font-size: 2rem;
+      margin-right: 0.5rem;
+      color: var(--dashboard-blue);
+    }
+    .navbar-custom .btn-group-header {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-left: auto;
+    }
+    .navbar-custom .btn-outline-secondary,
+    .navbar-custom .btn-outline-primary {
+      border-color: var(--dashboard-border);
+      color: var(--dashboard-blue-dark);
+      background: #fff;
+    }
+    .navbar-custom .btn-outline-primary {
+      border-color: var(--dashboard-blue);
+      color: var(--dashboard-blue);
+    }
+    .cart-badge {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .cart-badge .badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 50%;
+      min-width: 24px;
+      text-align: center;
+    }
+    .cart-badge .badge.hidden {
+      display: none;
+    }
+    #productContainer .card {
+      border-radius: 16px;
+      border: 1px solid var(--dashboard-border);
+      background: var(--dashboard-card);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+    .muted-small {
+      font-size: .9rem;
+      color: #64748b;
+    }
+    .out-of-stock {
+      opacity: 0.7;
+      position: relative;
+    }
+    .out-of-stock::after {
+      content: "Out of Stock";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(220, 38, 38, 0.85);
+      color: white;
+      font-size: .8rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .low-stock-badge {
+      display: inline-block;
+      margin-left: 8px;
+      background: var(--dashboard-gold);
+      color: #111827;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: .8rem;
+    }
+    .product-card {
+      border-radius: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-bottom: 1rem;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1);
+    }
+    .card-title {
+      font-weight: 700;
+      color: var(--dashboard-blue-dark);
+      font-size: 1rem;
+      word-wrap: break-word;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .btn {
+      width: auto;
+      min-width: 100px;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 999px;
+    }
+    .btn-primary,
+    .btn-success {
+      background: linear-gradient(135deg, var(--dashboard-blue), #2563eb);
+      border: none;
+      color: white;
+    }
+    .btn-outline-primary {
+      border-color: var(--dashboard-blue);
+      color: var(--dashboard-blue);
+    }
+    .btn-outline-primary:hover {
+      background: var(--dashboard-blue);
+      color: white;
+    }
+    .form-control {
+      width: 100%;
+      border: 1px solid var(--dashboard-border);
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      background: #fff;
+    }
+    .form-control:focus {
+      border-color: var(--dashboard-blue);
+      box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.15);
+    }
+    .filter-label {
+      color: var(--dashboard-blue);
+      font-weight: 600;
+    }
+    .filter-timestamp {
+      color: #64748b;
+      font-size: .9rem;
+      font-weight: 600;
+      margin-right: .45rem;
+    }
+    .quantity-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid var(--dashboard-border);
+      border-radius: 999px;
+      padding: 0.2rem;
+      background: var(--dashboard-blue-soft);
+    }
+    .quantity-control .btn {
+      min-width: 34px;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 1rem;
+      color: var(--dashboard-blue);
+      background: white;
+      border: none;
+    }
+    .quantity-control span {
+      min-width: 1.2rem;
+      text-align: center;
+      font-weight: 700;
+      color: var(--dashboard-blue-dark);
+    }
+    #cartList {
+      gap: 0.75rem;
+    }
+    #cartList .list-group-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #f8fbff;
+      padding: 0.9rem;
+    }
+    #cartList li {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    #cartList li button {
+      margin-top: 6px;
+      width: 100%;
+    }
+    .cart-summary-card {
+      background: linear-gradient(135deg, var(--dashboard-blue-soft) 0%, #ffffff 100%);
+      border: 1px solid var(--dashboard-border);
+      border-radius: 20px;
+      padding: 1rem;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    #sendToWhatsAppBtn,
+    #clearCartBtn {
+      width: auto;
+      min-width: 120px;
+      flex: 0 0 auto;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 999px;
+    }
+    #choiceModal .modal-content,
+    #whatsappModal .modal-content {
+      background: linear-gradient(135deg, #ffffff, #f9f9f9);
+      border-radius: 20px;
+      padding: 1rem;
+    }
+    #choiceModal .modal-title,
+    #whatsappModal .modal-title {
+      font-size: 1.25rem;
+      color: var(--dashboard-blue);
+    }
+    #choiceModal .btn,
+    #whatsappModal .btn {
+      font-weight: 600;
+      transition: all 0.25s ease;
+    }
+    #choiceModal .btn:hover,
+    #whatsappModal .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .animate-slide-up {
+      animation: slideUp 0.4s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-dialog {
+      max-width: 500px;
+      margin: auto;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 140px;
+      }
+      #sendToWhatsAppBtn,
+      #clearCartBtn {
+        width: 100%;
+        flex: 1 1 100%;
+        margin-top: 8px;
+      }
+    }
+    @media (max-width: 576px) {
+      .navbar-custom .navbar-brand {
+        font-size: 1.2rem;
+      }
+      .navbar-custom .navbar-brand span {
+        font-size: 1.5rem;
+      }
+      .navbar-custom .btn-group-header {
+        gap: 0.5rem;
+        margin-left: auto;
+      }
+      .navbar-custom .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+      .product-card {
+        margin-bottom: 1rem;
+      }
+      .card-title {
+        font-size: 1rem;
+        word-wrap: break-word;
+      }
+      .modal-dialog {
+        max-width: 95%;
+      }
+    }
+  </style>
+</head>
+<body class="p-4 bg-light">
+  <nav class="navbar navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="#">
+        <span>🛒 R.M.S </span> 
+      </a>
+      <div class="btn-group-header">
+        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+          ☰ Filter Items
+        </button>
+        <div class="cart-badge">
+          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+            🛒 Cart
+          </button>
+          <span class="badge hidden" id="cartCountBadge">0</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container px-4 py-4">
+    <div class="row g-3 align-items-center mb-4">
+      <div class="col-lg-8">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-0">🔍</span>
+          <input type="text" id="searchInput" class="form-control" placeholder="Search for products...">
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="cart-summary-card d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-uppercase fw-bold text-primary">Order summary</div>
+            <div class="fw-bold text-dark">Ready for checkout</div>
+          </div>
+          <div class="badge bg-primary-subtle text-primary fw-semibold" id="cartSummaryBadge">0 items</div>
+        </div>
+      </div>
+    </div>
+
+    <span id="filterTimestamp" class="filter-timestamp me-2"></span>
+    <div>
+      <h5 class="text-secondary mb-3">Showing: Today's Menu</h5>
+    </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Filter by Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="list-group" id="categoryList">
+          <li class="list-group-item list-group-item-action" data-cat="" data-sub="" role="button">All Products</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="productContainer" class="row g-3 text-center">
+      <p id="loadingText" class="text-muted">Loading products...</p>
+    </div>
+
+    <div class="modal fade" id="choiceModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg border-0">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold text-primary">🍴 How would you like to receive your order?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <p class="text-muted mb-4">Choose an option to continue to checkout.</p>
+            <div class="d-grid gap-3">
+              <button id="eatInBtn" class="btn btn-lg btn-outline-success rounded-pill shadow-sm">🍽️ Eat In</button>
+              <button id="takeOutBtn" class="btn btn-lg btn-outline-info rounded-pill shadow-sm">🛍️ Take Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="whatsappModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg border-0 animate-slide-up">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold text-primary">📝 Enter Order Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="diningOption" value="">
+            <div id="eatInFields" style="display:none;" class="mb-3">
+              <label for="tableNumber" class="form-label">🍽️ Table Number (optional)</label>
+              <input id="tableNumber" class="form-control rounded-pill shadow-sm" placeholder="e.g. 5" autocomplete="off">
+            </div>
+            <div id="takeOutFields" style="display:none;">
+              <div class="mb-3">
+                <label for="customerName" class="form-label">🧑‍🍳 Name (optional)</label>
+                <input id="customerName" class="form-control rounded-pill shadow-sm" placeholder="Your name" autocomplete="off">
+              </div>
+              <div class="mb-3">
+                <label for="customerPhone" class="form-label">📱 Phone Number (optional)</label>
+                <input id="customerPhone" class="form-control rounded-pill shadow-sm" placeholder="e.g. 08012345678" autocomplete="off">
+              </div>
+              <div class="mb-3">
+                <label for="customerAddress" class="form-label">🏠 Delivery Address (optional)</label>
+                <textarea id="customerAddress" class="form-control shadow-sm rounded-3" rows="2" placeholder="e.g. 23, Adeniyi Street, Ikeja, Lagos"></textarea>
+              </div>
+            </div>
+            <div id="whatsappWarning" class="text-danger small" style="display:none;"></div>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-success rounded-pill shadow-sm" id="confirmSendBtn">✅ Send to WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+      <div class="offcanvas-header border-bottom">
+        <div>
+          <h5 class="offcanvas-title fw-bold">🧾 Your order</h5>
+          <p class="text-muted small mb-0">Review, adjust, and finish your purchase.</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body d-flex flex-column p-3">
+        <div class="cart-summary-card mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small text-uppercase fw-bold text-primary">Subtotal</div>
+              <div class="fw-bold fs-5 text-dark">₦<span id="totalPrice">0</span></div>
+            </div>
+            <div class="badge bg-primary text-white" id="cartCountBadgeInline">0 items</div>
+          </div>
+        </div>
+        <ul id="cartList" class="list-group mb-3 flex-grow-1"></ul>
+        <div class="d-flex gap-2 mt-auto">
+          <button class="btn btn-outline-danger flex-grow-1" id="clearCartBtn">Clear</button>
+          <button class="btn btn-primary flex-grow-1" id="sendToWhatsAppBtn">Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/index.js"></script>
+</body>
+</html>

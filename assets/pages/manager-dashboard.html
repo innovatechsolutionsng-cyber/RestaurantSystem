@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager Dashboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="dashboard-page">
+  <div class="dashboard-shell">
+    <!-- Mobile hamburger (fixed) -->
+    <button class="mobile-menu-button" id="mobileMenuToggle" aria-label="Open navigation">
+      <span class="mobile-menu-icon"></span>
+    </button>
+
+    <aside class="dashboard-sidebar collapsed" id="dashboardSidebar">
+      <div class="sidebar-brand">
+        <div class="brand-copy">
+          <span class="brand-mark">RMS</span>
+          <span class="brand-name">Manager</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Manager dashboard navigation">
+        <button class="nav-item active" data-panel="summary">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5"/><path d="M9 22V12h6v10"/></svg>
+          </span>
+          <span class="nav-text">Dashboard</span>
+        </button>
+        <button class="nav-item" data-panel="categories">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+          </span>
+          <span class="nav-text">Categories</span>
+        </button>
+        <button class="nav-item" data-panel="inventory">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" ry="2"/><path d="M16 3v4"/><path d="M8 3v4"/></svg>
+          </span>
+          <span class="nav-text">Inventory</span>
+        </button>
+        <button class="nav-item" data-panel="sales">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20v-6"/><path d="M12 20V8"/><path d="M18 20v-4"/></svg>
+          </span>
+          <span class="nav-text">Sales</span>
+        </button>
+        <button class="nav-item" data-panel="users">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-3-3.87"/><path d="M7 21v-2a4 4 0 0 1 3-3.87"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="nav-text">User Management</span>
+        </button>
+        <button class="nav-item" data-panel="report">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          </span>
+          <span class="nav-text">Report</span>
+        </button>
+        <button class="nav-item" data-panel="archived">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="4"/><path d="M21 8v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M10 12h4"/></svg>
+          </span>
+          <span class="nav-text">Archived Report</span>
+        </button>
+      </nav>
+    </aside>
+
+    <div class="dashboard-content">
+      <div class="dashboard-topbar">
+        <div class="container topbar-inner">
+          <p class="topbar-title" id="topbarTitle">Dashboard</p>
+          <div class="topbar-actions">
+            <div class="settings-menu-wrapper">
+              <button id="settingsButton" class="icon-button" aria-label="Open settings" aria-expanded="false" aria-controls="settingsMenu">
+                <svg class="lucide lucide-settings" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 2.28 16.9l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09c.67 0 1.2-.45 1.51-1a1.65 1.65 0 0 0-.33-1.82L4.31 3.3A2 2 0 1 1 7.14.47l.06.06c.5.5 1.1.72 1.82.33.4-.22.85-.22 1.25 0 .72.39 1.32.17 1.82-.33l.06-.06A2 2 0 1 1 18.6 4.31l-.06.06c-.5.5-.72 1.1-.33 1.82.22.39.22.85 0 1.25.39.72.17 1.32-.33 1.82l-.06.06A2 2 0 1 1 19.4 15z"></path></svg>
+              </button>
+              <div id="settingsMenu" class="settings-menu" aria-hidden="true">
+                <button type="button" class="settings-menu-item" data-action="profile">
+                  <svg class="settings-menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span>Profile</span>
+                </button>
+                <button type="button" class="settings-menu-item" data-action="business">
+                  <svg class="settings-menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 11h4"/><path d="M16 15h4"/><path d="M6 11h2"/><path d="M6 15h2"/></svg>
+                  <span>Business settings</span>
+                </button>
+                <button type="button" class="settings-menu-item" data-action="financial">
+                  <svg class="settings-menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8c-2 0-3 2-3 3s1 3 3 3 3 2 3 3-1 3-3 3"/><path d="M4 6h16"/><path d="M4 18h16"/></svg>
+                  <span>Financial settings</span>
+                </button>
+                <button type="button" class="settings-menu-item" data-action="system">
+                  <svg class="settings-menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20m10-10H2"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span>System settings</span>
+                </button>
+              </div>
+            </div>
+            <button id="logoutIconButton" class="icon-button" aria-label="Logout">
+              <svg class="lucide lucide-log-out" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <header class="dashboard-header">
+        <div class="container header-inner">
+          <div></div>
+          <div class="header-actions"></div>
+        </div>
+      </header>
+
+      <main class="container dashboard-main">
+        <section class="panel panel-summary active" data-panel="summary">
+          <div class="dashboard-summary">
+            <article class="stat-card">
+              <p class="stat-label">Total Sales</p>
+              <h2 id="revenueValue">₦0.00</h2>
+              <p class="metric-note muted-small">Daily revenue from completed orders.</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Total Orders</p>
+              <h2 id="openOrdersValue">0</h2>
+              <p class="metric-note muted-small">Number of orders created today.</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Cancelled Orders</p>
+              <h2 id="cancelledOrdersValue">0</h2>
+              <p class="metric-note muted-small">Orders canceled by staff or customers.</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Active Users</p>
+              <h2 id="salesActiveUsersValue">0</h2>
+              <p class="metric-note muted-small">Counts all currently active system users.</p>
+            </article>
+          </div>
+
+          <div class="quick-actions-section">
+            <div class="section-heading">
+              <p class="section-subtitle">Quick Actions</p>
+            </div>
+            <div class="actions-grid">
+            <button id="addItemBtn" class="action-card" aria-label="Add Products">
+              <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span class="action-label">Add Product</span>
+            </button>
+
+            <button id="viewSalesBtn" class="action-card" aria-label="View sales">
+              <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M12 17V9"></path><path d="M8 13v4"></path><path d="M16 11v6"></path></svg>
+              <span class="action-label">View sales</span>
+            </button>
+
+            <button id="generateReportBtn" class="action-card" aria-label="Generate report">
+              <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8V7a2 2 0 0 0-2-2h-3"></path><path d="M3 7v13a2 2 0 0 0 2 2h14"></path><path d="M8 3v4"></path><path d="M16 13h-8"></path></svg>
+              <span class="action-label">Generate report</span>
+            </button>
+
+            <button id="manageUsersBtn" class="action-card" aria-label="Manage users">
+              <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-3-3.87"></path><path d="M7 21v-2a4 4 0 0 1 3-3.87"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span class="action-label">Manage users</span>
+            </button>
+          </div>
+
+          <section class="dashboard-orders">
+            <div class="panel-grid">
+              <div>
+                <div class="section-heading">
+                  <p class="section-subtitle">Recent sales</p>
+                </div>
+                <div class="orders-table-wrapper">
+                  <table class="orders-table">
+                    <thead>
+                      <tr>
+                        <th>Time</th>
+                        <th>Cashier</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ordersBody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div>
+                <div class="section-heading">
+                  <p class="section-subtitle">Active Cashiers</p>
+                </div>
+                <div class="panel-card">
+                  <div class="orders-table-wrapper">
+                    <table class="orders-table">
+                      <thead>
+                        <tr>
+                          <th>Cashier</th>
+                          <th>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody id="activeUsersBody">
+                        <!-- Filled dynamically or manually -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="panel" data-panel="categories">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Keep product categories organized and visible.</p>
+              <p class="panel-card-note">Create categories, view counts, and inspect descriptions without leaving this section.</p>
+            </div>
+            <button id="openCategoryModalBtn" type="button" class="button-primary">Add category</button>
+          </div>
+          <div class="category-panel-shell">
+            <div class="category-panel-header">
+              <div>
+                <p class="category-panel-title">Category overview</p>
+                <p class="category-panel-text">Each card shows how many products use the category plus its description.</p>
+              </div>
+            </div>
+            <div id="categoryList" class="category-card-grid">
+              <p class="empty-state">No categories yet. Add a category to begin.</p>
+            </div>
+            <div id="categoryPagination" class="pagination-controls" style="display: none;">
+              <button type="button" class="pagination-btn pagination-prev" id="categoryPrevBtn">← Previous</button>
+              <span id="categoryPageInfo" class="pagination-info"></span>
+              <button type="button" class="pagination-btn pagination-next" id="categoryNextBtn">Next →</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="inventory">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Manage inventory products from a single place.</p>
+              <p class="panel-card-note">Create products, track stock levels, and control availability.</p>
+            </div>
+            <button id="openProductModalBtn" type="button" class="button-primary">Add product</button>
+          </div>
+
+          <div class="inventory-panel-shell">
+            <div class="inventory-panel-header">
+              <div>
+                <p class="inventory-panel-title">Inventory overview</p>
+                <p class="inventory-panel-text">Each product card shows category, stock status, price, and description.</p>
+              </div>
+              <div class="inventory-metrics inventory-metrics-compact">
+                <article class="stat-card inventory-stat-card">
+                  <p class="stat-count" id="inventoryProductCount">0</p>
+                  <p class="stat-label">Products</p>
+                </article>
+                <article class="stat-card inventory-stat-card">
+                  <p class="stat-count" id="inventoryOutOfStockCount">0</p>
+                  <p class="stat-label">Out of stock</p>
+                </article>
+              </div>
+            </div>
+
+            <div class="section-controls inventory-filters">
+              <div class="filter-group">
+                <input id="productSearchInput" type="search" placeholder="Search by name or category" />
+              </div>
+              <div class="filter-group">
+                <select id="productStatusFilter">
+                  <option value="all">All status</option>
+                  <option value="Available">Available</option>
+                  <option value="Out of stock">Out of stock</option>
+                  <option value="Discontinued">Discontinued</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="productList" class="inventory-card-grid">
+              <p class="empty-state">No products yet. Add a product to populate this list.</p>
+            </div>
+            <div id="productPagination" class="pagination-controls" style="display: none;">
+              <button type="button" class="pagination-btn pagination-prev" id="productPrevBtn">← Previous</button>
+              <span id="productPageInfo" class="pagination-info"></span>
+              <button type="button" class="pagination-btn pagination-next" id="productNextBtn">Next →</button>
+            </div>
+          </div>
+        </section>
+
+        <div id="categoryModal" class="modal-overlay" aria-hidden="true">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+            <div class="modal-header">
+              <div>
+                <h3 id="categoryModalTitle">Add category</h3>
+                <p class="modal-note">Create a category to organize products and keep inventory clean.</p>
+              </div>
+              <button class="modal-close" type="button" aria-label="Close category modal">×</button>
+            </div>
+            <div class="modal-body">
+              <label class="form-field">
+                <span>Category name</span>
+                <input id="modalCategoryName" type="text" placeholder="e.g. Drinks" />
+              </label>
+              <label class="form-field">
+                <span>Description</span>
+                <textarea id="modalCategoryDescription" rows="4" placeholder="Optional category description"></textarea>
+              </label>
+              <p id="modalCategoryMessage" class="form-message"></p>
+            </div>
+            <div class="modal-footer">
+              <button id="saveCategoryBtn" class="button-primary">Save category</button>
+              <button type="button" class="button-secondary modal-close">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="productModal" class="modal-overlay" aria-hidden="true">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+            <div class="modal-header">
+              <div>
+                <h3 id="productModalTitle">Add product</h3>
+                <p class="modal-note">Enter item details and assign the product to an existing category.</p>
+              </div>
+              <button class="modal-close" type="button" aria-label="Close product modal">×</button>
+            </div>
+            <div class="modal-body">
+              <label class="form-field">
+                <span>Item name</span>
+                <input id="modalProductName" type="text" placeholder="e.g. Signature Burger" />
+              </label>
+              <label class="form-field">
+                <span>Category</span>
+                <select id="modalProductCategorySelect">
+                  <option value="">Select category</option>
+                </select>
+              </label>
+              <div class="form-row triple-row">
+                <label class="form-field">
+                  <span>Price</span>
+                  <input id="modalProductPrice" type="number" min="0" step="0.01" placeholder="00.00" />
+                </label>
+                <label class="form-field">
+                  <span>Stock quantity</span>
+                  <input id="modalProductStock" type="number" min="0" step="1" placeholder="0" />
+                </label>
+                <label class="form-field">
+                  <span>Status</span>
+                  <select id="modalProductStatus">
+                    <option value="">Select status</option>
+                    <option value="Available">Available</option>
+                    <option value="Out of stock">Out of stock</option>
+                    <option value="Discontinued">Discontinued</option>
+                  </select>
+                </label>
+              </div>
+              <label class="form-field">
+                <span>Description</span>
+                <textarea id="modalProductDescription" rows="3" placeholder="Optional product notes"></textarea>
+              </label>
+              <p id="modalProductMessage" class="form-message"></p>
+            </div>
+            <div class="modal-footer">
+              <button id="saveProductBtn" class="button-primary">Save product</button>
+              <button type="button" class="button-secondary modal-close">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="confirmModal" class="modal-overlay" aria-hidden="true">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+            <div class="modal-header">
+              <div>
+                <h3 id="confirmModalTitle">Confirm</h3>
+                <p id="confirmModalText" class="modal-note">Are you sure you want to proceed?</p>
+              </div>
+              <button class="modal-close" type="button" aria-label="Close confirmation modal">×</button>
+            </div>
+            <div class="modal-footer">
+              <button id="confirmModalCancel" type="button" class="button-secondary modal-close">Cancel</button>
+              <button id="confirmModalConfirm" type="button" class="button-primary">Confirm</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="userModal" class="modal-overlay" aria-hidden="true">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+            <div class="modal-header">
+              <div>
+                <h3 id="userModalTitle">Add user</h3>
+                <p class="modal-note">Enter staff credentials and select a role for the new user.</p>
+              </div>
+              <button class="modal-close" type="button" aria-label="Close user modal">×</button>
+            </div>
+            <div class="modal-body">
+              <label class="form-field">
+                <span>Full name</span>
+                <input id="modalUserFullName" type="text" placeholder="e.g. Ada Johnson" />
+              </label>
+              <label class="form-field">
+                <span>Username</span>
+                <input id="modalUserUsername" type="text" placeholder="e.g. cashier1" />
+              </label>
+              <label class="form-field">
+                <span>Password</span>
+                <input id="modalUserPassword" type="password" placeholder="Create password" />
+              </label>
+              <label class="form-field">
+                <span>Role</span>
+                <select id="modalUserRole">
+                  <option value="cashier">Cashier</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span>Status</span>
+                <select id="modalUserStatus">
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </label>
+              <p id="modalUserMessage" class="form-message"></p>
+            </div>
+            <div class="modal-footer">
+              <button id="saveUserBtn" class="button-primary">Save user</button>
+              <button type="button" class="button-secondary modal-close">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="panel" data-panel="sales">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Review daily sales performance and revenue summary from across the restaurant.</p>
+              <p class="panel-card-note">Use the filters to narrow down results by date, cashier, or order status.</p>
+            </div>
+              
+          </div>
+
+          <div class="sales-filter-row section-controls">
+            <div class="filter-group">
+              <label class="form-field">
+                <span>From</span>
+                <input id="salesStartDateInput" type="date" />
+              </label>
+            </div>
+            <div class="filter-group">
+              <label class="form-field">
+                <span>To</span>
+                <input id="salesEndDateInput" type="date" />
+              </label>
+            </div>
+            <div class="filter-group">
+              <label class="form-field">
+                <span>Cashier</span>
+                <select id="salesCashierFilter">
+                  <option value="all">All cashiers</option>
+                </select>
+              </label>
+            </div>
+            <div class="filter-group">
+              <label class="form-field">
+                <span>Status</span>
+                <select id="salesStatusFilter">
+                  <option value="all">All statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="voided">Voided</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="panel-grid sales-metrics-grid">
+            <article class="panel-card">
+              <h3>Total sales</h3>
+              <p id="salesTotalValue">₦0.00</p>
+              <p class="metric-note muted-small">Sum of recent order totals used for this sales summary.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Total items</h3>
+              <p id="salesItemsValue">0</p>
+              <p class="metric-note muted-small">Total quantity of items sold across the displayed orders.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Voided items</h3>
+              <p id="salesVoidedValue">0</p>
+              <p class="metric-note muted-small">Count of orders marked as voided in the displayed sales.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Cancelled orders</h3>
+              <p id="salesCancelledValue">0</p>
+              <p class="metric-note muted-small">Count of orders canceled in the displayed sales.</p>
+            </article>
+          </div>
+
+          <div class="panel-card sales-table-wrapper">
+            <div class="section-heading">
+              <p class="section-subtitle">Sales history</p>
+            </div>
+            <div class="orders-table-wrapper">
+              <table class="orders-table sales-table">
+                <thead>
+                  <tr>
+                    <th>Date/Time</th>
+                    <th>Order ID</th>
+                    <th>Cashier</th>
+                    <th>Items</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+              </table>
+            </div>
+            <div id="salesPagination" class="pagination-controls" style="display: none;">
+              <button type="button" class="pagination-btn pagination-prev" id="salesPrevBtn">← Previous</button>
+              <span id="salesPageInfo" class="pagination-info"></span>
+              <button type="button" class="pagination-btn pagination-next" id="salesNextBtn">Next →</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="users">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Manage staff access and review registered user roles.</p>
+              <p class="panel-card-note">Search staff, filter by role, and add new users to the restaurant team.</p>
+            </div>
+            <button id="openUserModalBtn" type="button" class="button-primary">Add user</button>
+          </div>
+
+          <div class="user-management-controls section-controls">
+            <div class="filter-group">
+              <input id="usersSearchInput" type="search" placeholder="Search staff by name or username" />
+            </div>
+            <div class="filter-group">
+              <select id="usersRoleFilter">
+                <option value="all">All roles</option>
+                <option value="manager">Manager</option>
+                <option value="cashier">Cashier</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <select id="usersStatusFilter">
+                <option value="all">All status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="panel-card user-table-wrapper">
+            <div class="section-heading">
+              <p class="section-subtitle">Staff directory</p>
+            </div>
+            <div class="orders-table-wrapper">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last seen</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+              </table>
+            </div>
+            <div id="usersPagination" class="pagination-controls" style="display: none;">
+              <button type="button" class="pagination-btn pagination-prev" id="usersPrevBtn">← Previous</button>
+              <span id="usersPageInfo" class="pagination-info"></span>
+              <button type="button" class="pagination-btn pagination-next" id="usersNextBtn">Next →</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="report">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Generate sales reports, analyze product trends, and review staff performance.</p>
+              <p class="panel-card-note">Select a starting date to view past transactions from, then save the current report.</p>
+            </div>
+            <div class="report-header-actions">
+              <label class="form-field report-date-filter">
+                
+                <input id="reportStartDateInput" type="date" />
+              </label>
+              <button id="saveReportBtn" type="button" class="button-primary">Save report</button>
+            </div>
+          </div>
+
+          <div class="panel-grid sales-metrics-grid report-metrics-grid">
+            <article class="panel-card">
+              <h3>Today's sales</h3>
+              <p id="reportTodaysSalesValue">₦0.00</p>
+              <p class="metric-note muted-small">Completed sales recorded today.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Total sales</h3>
+              <p id="reportTotalSalesCountValue">0</p>
+              <p class="metric-note muted-small">Number of orders in the selected report range.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Best selling item</h3>
+              <p id="reportBestSellingItemValue">—</p>
+              <p class="metric-note muted-small">Top product by quantity sold in the selected range.</p>
+            </article>
+          </div>
+
+          <div class="panel-grid report-charts-grid">
+            <article class="panel-card">
+              <div class="section-heading">
+                <p class="section-subtitle">Daily sales trend</p>
+              </div>
+              <div id="reportDailySalesTrend" class="report-chart"></div>
+            </article>
+            <article class="panel-card">
+              <div class="section-heading">
+                <p class="section-subtitle">Top products</p>
+              </div>
+              <div id="reportTopProductsChart" class="report-chart report-products-chart"></div>
+            </article>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-heading">
+              <p class="section-subtitle">Staff performance</p>
+            </div>
+            <div class="orders-table-wrapper">
+              <table class="orders-table report-table">
+                <thead>
+                  <tr>
+                    <th>Staff name</th>
+                    <th>Sales count</th>
+                    <th>Total sales</th>
+                  </tr>
+                </thead>
+                <tbody id="staffPerformanceBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="archived">
+          <div class="section-heading">
+            <p>Access older reports and historical snapshots for audit and trend analysis.</p>
+          </div>
+          <div class="panel-grid">
+            <article class="panel-card">
+              <h3>Historical archives</h3>
+              <p>Review completed reports by month, quarter, or year.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Audit-ready</h3>
+              <p>Keep a clean copy of archived data for bookkeeping and compliance.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="settings">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Settings for store profile, business operations, finances, and system behavior.</p>
+              <p class="panel-card-note">Configure the retail management experience to match your restaurant business rules and reporting needs.</p>
+            </div>
+            <button id="settingsBackBtn" type="button" class="button-secondary">Back to dashboard</button>
+          </div>
+
+          <div class="settings-panel-shell">
+            <div class="settings-tabs" role="tablist" aria-label="Settings sections">
+              <button type="button" class="settings-tab" data-settings-tab="profile">Profile</button>
+              <button type="button" class="settings-tab" data-settings-tab="business">Business</button>
+              <button type="button" class="settings-tab" data-settings-tab="financial">Financial</button>
+              <button type="button" class="settings-tab" data-settings-tab="system">System</button>
+            </div>
+
+            <div class="settings-section active placeholder" data-settings-section="placeholder">
+              <h3>Select a settings section</h3>
+              <p class="panel-card-note">Choose a section from the settings menu or tabs to view available options.</p>
+            </div>
+
+            <div class="settings-section" data-settings-section="profile">
+              <div class="settings-section-header">
+                <span class="settings-section-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <div>
+                  <h3>Profile settings</h3>
+                  <p class="panel-card-note">Manage your profile information and access credentials for the retail system.</p>
+                </div>
+              </div>
+              <div class="settings-form-grid">
+                <label class="form-field">
+                  <span>Full name</span>
+                  <input type="text" value="Store Manager" />
+                </label>
+                <label class="form-field">
+                  <span>Email address</span>
+                  <input type="email" value="manager@storeexample.com" />
+                </label>
+                <label class="form-field">
+                  <span>Phone number</span>
+                  <input type="tel" value="+234 801 234 5678" />
+                </label>
+                <label class="form-field">
+                  <span>User role</span>
+                  <select>
+                    <option>Manager</option>
+                    <option>Supervisor</option>
+                    <option>Administrator</option>
+                  </select>
+                </label>
+              </div>
+              <div class="form-field">
+                <span>Reset password</span>
+                <input type="password" placeholder="Enter new password" />
+              </div>
+            </div>
+
+            <div class="settings-section" data-settings-section="business">
+              <div class="settings-section-header">
+                <span class="settings-section-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 11h4"/><path d="M16 15h4"/><path d="M6 11h2"/><path d="M6 15h2"/></svg>
+                </span>
+                <div>
+                  <h3>Business settings</h3>
+                  <p class="panel-card-note">Configure business information and preferences.</p>
+                </div>
+              </div>
+              <div class="settings-form-grid">
+                <label class="form-field">
+                  <span>Business name</span>
+                  <input id="businessNameInput" type="text" value="RMS Restaurant Branch" />
+                </label>
+                <label class="form-field">
+                  <span>Business address</span>
+                  <input id="businessAddressInput" type="text" value="12 Market Road, Lagos" />
+                </label>
+                <label class="form-field">
+                  <span>Business phone</span>
+                  <input id="businessPhoneInput" type="tel" value="+234 809 876 5432" />
+                </label>
+                <label class="form-field">
+                  <span>Business email</span>
+                  <input id="businessEmailInput" type="email" value="info@restaurant.com" />
+                </label>
+                <label class="form-field">
+                  <span>Receipt footer message</span>
+                  <textarea id="receiptFooterInput" rows="3">Thank you for shopping with us. Visit again!</textarea>
+                </label>
+              </div>
+              <div class="form-actions">
+                <button id="saveBusinessSettingsBtn" type="button" class="button-primary">Save business settings</button>
+              </div>
+            </div>
+
+            <div class="settings-section" data-settings-section="financial">
+              <div class="settings-section-header">
+                <span class="settings-section-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8c-2 0-3 2-3 3s1 3 3 3 3 2 3 3-1 3-3 3"/><path d="M4 6h16"/><path d="M4 18h16"/></svg>
+                </span>
+                <div>
+                  <h3>Financial settings</h3>
+                  <p class="panel-card-note">Configure tax rates, discounts and currency settings.</p>
+                </div>
+              </div>
+              <div class="settings-form-grid">
+                <label class="form-field">
+                  <span>Tax rate</span>
+                  <input id="taxRateInput" type="text" value="7.5%" />
+                </label>
+                <label class="form-field">
+                  <span>Default discount</span>
+                  <input id="defaultDiscountInput" type="text" value="0%" />
+                </label>
+                <label class="form-field">
+                  <span>Currency</span>
+                  <select id="currencyInput">
+                    <option value="NGN" selected>₦ Nigerian Naira</option>
+                    <option value="USD">$ US Dollar</option>
+                  </select>
+                </label>
+              </div>
+              <div class="form-actions">
+                <button id="saveFinancialSettingsBtn" type="button" class="button-primary">Save financial settings</button>
+              </div>
+              <p id="currencyStatusMessage" class="settings-status-text">Currency changes will update values across the dashboard.</p>
+            </div>
+
+            <div class="settings-section" data-settings-section="system">
+              <div class="settings-section-header">
+                <span class="settings-section-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20m10-10H2"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <div>
+                  <h3>System settings</h3>
+                  <p class="panel-card-note">Manage app behavior, data retention, notifications, and backup preferences.</p>
+                </div>
+              </div>
+              <div class="settings-form-grid">
+                <label class="form-field">
+                  <span>Timezone</span>
+                  <select id="systemTimezoneInput">
+                    <option selected>Africa/Lagos</option>
+                    <option>UTC</option>
+                  </select>
+                </label>
+                <label class="form-field">
+                  <span>Backup frequency</span>
+                  <select id="systemBackupFrequencyInput">
+                    <option selected>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                  </select>
+                </label>
+                <label class="form-field">
+                  <span>Notification alerts</span>
+                  <select id="systemNotificationAlertsInput">
+                    <option selected>Enabled</option>
+                    <option>Disabled</option>
+                  </select>
+                </label>
+                <label class="form-field">
+                  <span>Data retention</span>
+                  <input id="systemDataRetentionInput" type="text" value="365 days" />
+                </label>
+                <label class="form-field">
+                  <span>Pagination size</span>
+                  <input id="systemPaginationSizeInput" type="number" min="1" placeholder="10" value="10" />
+                </label>
+                <label class="form-field form-field-switch">
+                  <div class="form-field-switch-row">
+                    <span>Enable stock counting</span>
+                    <div class="switch-control">
+                      <input id="systemStockCountingInput" type="checkbox" />
+                      <span class="switch-text">Track inventory levels automatically</span>
+                    </div>
+                  </div>
+                  <p class="form-field-note">When enabled, stock counts are adjusted from sales and alerts can be generated for low inventory.</p>
+                </label>
+              </div>
+              <div class="form-actions">
+                <button id="saveSystemSettingsBtn" type="button" class="button-primary">Save system settings</button>
+              </div>
+            </div>
+          </div>
+          <!-- Report preview modal -->
+          <div id="reportPreviewModal" class="modal-overlay" aria-hidden="true">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reportPreviewTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="reportPreviewTitle">Report preview</h3>
+                  <p id="reportPreviewSubtitle" class="modal-note">A summary of transactions for the selected day.</p>
+                </div>
+                <button class="modal-close" type="button" aria-label="Close report preview">×</button>
+              </div>
+              <div class="modal-body" id="reportPreviewBody">
+                <!-- Filled dynamically -->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="button-secondary modal-close">Close</button>
+                <button id="downloadReportBtn" type="button" class="button-primary">Download</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+    <script src="../js/auth.js"></script>
+  <script src="../js/manager-dashboard.js"></script>
+</body>
+</html>

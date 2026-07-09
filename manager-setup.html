@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager Setup</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="dashboard-page">
+  <header class="dashboard-header">
+    <div class="container header-inner">
+      <div>
+        <p class="eyebrow">Manager Setup</p>
+        <h1>Create a new manager account</h1>
+      </div>
+      <div class="header-actions">
+        <button id="backButton" class="button-secondary">Back</button>
+        <button id="logoutButton" class="button-secondary">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container dashboard-main">
+    <section class="dashboard-orders">
+      <div class="section-heading">
+        <h2>New Manager Account</h2>
+        <p>Only authenticated managers may create additional manager users.</p>
+      </div>
+      <div id="setupStatusMessage" class="login-message" aria-live="polite">Checking access to manager setup...</div>
+      <form id="managerSetupForm" class="login-form" aria-label="Manager setup form">
+        <label for="newUsername">Username</label>
+        <input type="text" id="newUsername" name="newUsername" placeholder="Enter username" required />
+
+        <label for="newPassword">Password</label>
+        <input type="password" id="newPassword" name="newPassword" placeholder="Enter password" required />
+
+        <label for="jwtSecret">JWT Secret</label>
+        <input type="text" id="jwtSecret" name="jwtSecret" placeholder="Enter manager JWT secret" required />
+
+        <button type="submit" class="button-primary">Create Manager</button>
+      </form>
+      <div id="setupMessage" class="login-message" aria-live="polite">Create a manager account using the manager JWT secret.</div>
+    </section>
+  </main>
+
+  <script src="assets/js/manager-setup.js"></script>
+</body>
+</html>

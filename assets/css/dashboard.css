@@ -1,0 +1,75 @@
+.dashboard-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #edf2ff 0%, #f9fbff 100%);
+}
+
+.dashboard-header {
+  padding: 2rem 0 1rem;
+}
+
+.dashboard-main {
+  padding-bottom: 3rem;
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  padding: 1.75rem;
+  border-radius: 24px;
+  background: white;
+  border: 1px solid rgba(15, 55, 110, 0.08);
+  box-shadow: 0 24px 40px rgba(12, 40, 94, 0.06);
+}
+
+.stat-label {
+  margin: 0 0 1rem;
+  color: #5b6b8d;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+}
+
+.dashboard-orders {
+  background: white;
+  border-radius: 28px;
+  padding: 2rem;
+  box-shadow: 0 18px 40px rgba(12, 40, 94, 0.06);
+}
+
+.orders-table-wrapper {
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 55, 110, 0.08);
+}
+
+.orders-table th {
+  color: #1f2f5d;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.orders-table tbody tr:hover {
+  background: rgba(74, 108, 255, 0.04);
+}
+
+@media (max-width: 900px) {
+  .dashboard-summary {
+    grid-template-columns: 1fr;
+  }
+}

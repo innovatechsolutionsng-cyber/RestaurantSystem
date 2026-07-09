@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cashier Dashboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="dashboard-page">
+  <div class="dashboard-shell">
+    <button class="mobile-menu-button" id="mobileMenuToggle" aria-label="Open navigation">
+      <span class="mobile-menu-icon"></span>
+    </button>
+
+    <aside class="dashboard-sidebar collapsed" id="dashboardSidebar">
+      <div class="sidebar-brand">
+        <div class="brand-copy">
+          <span class="brand-mark">RMS</span>
+          <span class="brand-name">Cashier</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Cashier dashboard navigation">
+        <button class="nav-item active" data-panel="dashboard">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5"/><path d="M9 22V12h6v10"/></svg>
+          </span>
+          <span class="nav-text">Dashboard</span>
+        </button>
+        <button class="nav-item" data-panel="pos">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18"/><path d="M7 5v14"/><path d="M17 5v14"/><path d="M3 19h18"/><path d="M10 9h4"/></svg>
+          </span>
+          <span class="nav-text">Point of Sale</span>
+        </button>
+        <button class="nav-item" data-panel="sales">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20v-6"/><path d="M12 20V8"/><path d="M18 20v-4"/></svg>
+          </span>
+          <span class="nav-text">Sales</span>
+        </button>
+        <button class="nav-item" data-panel="report">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          </span>
+          <span class="nav-text">Report</span>
+        </button>
+      </nav>
+    </aside>
+
+    <div class="dashboard-content">
+      <div class="dashboard-topbar">
+        <div class="container topbar-inner">
+          <p class="topbar-title" id="topbarTitle">Dashboard</p>
+          <div class="topbar-actions">
+            <button id="settingsButton" class="icon-button" aria-label="Settings">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <button id="logoutButton" class="icon-button" aria-label="Logout">
+              <svg class="lucide lucide-log-out" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></path><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <header class="dashboard-header">
+        <div class="container header-inner">
+          <div></div>
+          <div class="header-actions"></div>
+        </div>
+      </header>
+
+      <main class="container dashboard-main">
+        <div class="panel active" data-panel="dashboard">
+          <section class="dashboard-summary">
+            <article class="stat-card">
+              <p class="stat-label">Today's Sales</p>
+              <h2 id="salesValue">0.00</h2>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Pending Orders</p>
+              <h2 id="pendingOrdersValue">0</h2>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Completed</p>
+              <h2 id="completedOrdersValue">0</h2>
+            </article>
+          </section>
+
+          <section class="dashboard-actions">
+            <div class="dashboard-actions-header">
+              <div>
+                <p class="section-label">Quick Actions</p>
+                <p class="section-description">Start a new sale, view recent orders, or check the report.</p>
+              </div>
+            </div>
+            <div class="actions-grid">
+              <button id="quickNewSale" type="button" class="action-card">
+                <span class="action-card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 9h-13z"/><path d="M6 6L4 2H2"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
+                </span>
+                <span>
+                  <span class="action-label">New Sale</span>
+                  <small>Start a new point of sale order.</small>
+                </span>
+              </button>
+              <button id="quickViewOrders" type="button" class="action-card">
+                <span class="action-card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/><path d="M8 6v12"/></svg>
+                </span>
+                <span>
+                  <span class="action-label">View Orders</span>
+                  <small>See recent transactions at a glance.</small>
+                </span>
+              </button>
+              <button id="quickViewReport" type="button" class="action-card">
+                <span class="action-card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 8v10"/><path d="M13 12v6"/><path d="M8 16v2"/></svg>
+                </span>
+                <span>
+                  <span class="action-label">View Report</span>
+                  <small>Open the report panel for summaries.</small>
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <section class="dashboard-orders">
+            <div class="section-heading">
+              <h2>Recent Transactions</h2>
+            </div>
+            <div class="orders-table-wrapper">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Order ID</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel" data-panel="pos">
+          <div class="section-heading section-heading-with-action">
+          <div> 
+            <p class="section-subtitle">Process customer orders quickly using available products, payment selection, and receipt-ready checkout.</p>
+          </div>
+        </div>
+          <div class="pos-layout">
+            <div class="pos-left">
+              <div class="pos-controls">
+                <input id="posProductSearch" type="search" placeholder="Search available products" />
+                <select id="posCategoryFilter">
+                  <option value="all">All categories</option>
+                </select>
+              </div>
+              <div class="pos-product-grid" id="posProductGrid">
+                <div class="panel-card">
+                  <p class="panel-card-note">Loading available products...</p>
+                </div>
+              </div>
+              <div class="pos-pagination" id="posPagination">
+                <button id="posPrevPageBtn" type="button" class="button-secondary">Previous</button>
+                <span id="posPageInfo">Page 1 of 1</span>
+                <button id="posNextPageBtn" type="button" class="button-secondary">Next</button>
+              </div>
+            </div>
+            <div class="pos-right">
+              <div class="pos-cart-panel panel-card">
+                <div class="cart-header">
+                  <div>
+                    <h3>Cart</h3>
+                  </div>
+                  <span id="posCartCount" class="cart-badge">0</span>
+                </div>
+                <div id="posCartItems" class="pos-cart-items">
+                  <p class="panel-card-note">No products added yet.</p>
+                </div>
+                <div class="pos-summary-card">
+                  <div class="pos-summary-line">
+                    <span>Subtotal</span>
+                    <strong id="posSubtotalAmount">₦0.00</strong>
+                  </div>
+                  <div class="pos-summary-line">
+                    <span>Tax</span>
+                    <strong id="posTaxAmount">₦0.00</strong>
+                  </div>
+                  <div class="pos-summary-line">
+                    <span>Discount</span>
+                    <strong id="posDiscountAmount">₦0.00</strong>
+                  </div>
+                  <div class="pos-summary-line pos-summary-total">
+                    <span>Total</span>
+                    <strong id="posTotalAmount">₦0.00</strong>
+                  </div>
+                </div>
+                <div class="pos-payment-section">
+                  <div class="pos-payment-header">
+                    <h4>Payment</h4>
+                    <span id="posDueAmount" class="pos-payment-due">₦0.00</span>
+                  </div>
+                  <div id="posPaymentFlow" class="pos-payment-flow">
+                    <div id="posMethodSelector" class="pos-method-selector">
+                      <p class="pos-method-label">Select payment method:</p>
+                      <p id="posMethodHelper" class="pos-method-helper">Single-click to pay full total. Double-click to split payment.</p>
+                      <div id="posAvailableMethods" class="pos-available-methods"></div>
+                    </div>
+                    <div id="posPaymentInput" class="pos-payment-input" style="display: none;">
+                      <div class="pos-input-group">
+                        <label id="posSelectedMethodLabel"></label>
+                        <input id="posPaymentAmount" type="number" placeholder="Enter amount" min="0" step="0.01" />
+                      </div>
+                      <div id="posPaymentActions" class="pos-payment-actions">
+                        <button id="posAddMethodBtn" type="button" class="button-secondary">Add Another Method</button>
+                        <button id="posClearMethodBtn" type="button" class="button-secondary">Clear</button>
+                      </div>
+                    </div>
+                    <div id="posPaymentSummary" class="pos-payment-summary" aria-live="polite">
+                      <span><strong>Paid</strong><strong id="posPaidAmount">₦0.00</strong></span>
+                      <span><strong>Remaining</strong><strong id="posRemainingAmount">₦0.00</strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="pos-cart-footer">
+                  <button id="posCheckoutBtn" type="button" class="button-primary">Checkout & Print Receipt</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="sales">
+          <div class="section-heading">
+            <p class="section-subtitle">Recent order breakdowns displayed as cards with payment details.</p>
+          </div>
+          <div id="salesCards" class="sales-cards">
+            <div class="panel-card">
+              <p class="panel-card-note">Loading recent sales...</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="report">
+          <div class="section-heading">
+            <p class="section-subtitle">A summary view of sales performance and recent transactions.</p>
+          </div>
+          <section class="dashboard-summary">
+            <article class="stat-card">
+              <p class="stat-label">Total Sales</p>
+              <h2 id="reportSalesValue">0.00</h2>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Pending Orders</p>
+              <h2 id="reportPendingOrdersValue">0</h2>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Completed Orders</p>
+              <h2 id="reportCompletedOrdersValue">0</h2>
+            </article>
+          </section>
+
+          <section class="dashboard-orders">
+            <div class="section-heading">
+              <h3>Recent Transactions</h3>
+            </div>
+            <div class="orders-table-wrapper">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Order ID</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="reportOrdersBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="confirmModalTitle">Confirm</h3>
+          <p id="confirmModalText" class="modal-note">Are you sure you want to proceed?</p>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close confirmation modal">×</button>
+      </div>
+      <div class="modal-footer">
+        <button id="confirmModalCancel" type="button" class="button-secondary modal-close">Cancel</button>
+        <button id="confirmModalConfirm" type="button" class="button-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="settingsModalTitle">Business Settings</h3>
+          <p class="modal-note">These values are used for receipts and business header/footer information.</p>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close settings modal">×</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-field">
+          <span>Business name</span>
+          <input id="cashierBusinessName" type="text" placeholder="e.g. Sunrise Bistro" />
+        </label>
+        <label class="form-field">
+          <span>Business address</span>
+          <input id="cashierBusinessAddress" type="text" placeholder="e.g. 123 Main Street" />
+        </label>
+        <label class="form-field">
+          <span>Business phone</span>
+          <input id="cashierBusinessPhone" type="text" placeholder="e.g. +234 800 000 000" />
+        </label>
+        <label class="form-field">
+          <span>Business email</span>
+          <input id="cashierBusinessEmail" type="email" placeholder="e.g. info@example.com" />
+        </label>
+        <label class="form-field">
+          <span>Receipt footer message</span>
+          <textarea id="cashierReceiptFooter" rows="3" placeholder="Thank you for shopping with us."></textarea>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button id="saveCashierSettingsBtn" class="button-primary">Save settings</button>
+        <button type="button" class="button-secondary modal-close">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="orderDetailsModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="orderDetailsModalTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="orderDetailsModalTitle">Sale Details</h3>
+          <p class="modal-note">View the full breakdown of this sale.</p>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close sale details modal">×</button>
+      </div>
+      <div id="orderDetailsModalBody" class="modal-body receipt-modal-body"></div>
+      <div class="modal-footer">
+        <button id="closeOrderDetailsBtn" type="button" class="button-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="receiptModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="receiptModalTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="receiptModalTitle">Receipt Preview</h3>
+          <p class="modal-note">Review the receipt before printing.</p>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close receipt preview">×</button>
+      </div>
+      <div id="receiptModalBody" class="modal-body receipt-modal-body"></div>
+      <div class="modal-footer">
+        <button id="printReceiptBtn" type="button" class="button-primary">Print Receipt</button>
+        <button id="closeReceiptBtn" type="button" class="button-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/cashier-dashboard.js"></script>
+</body>
+</html>

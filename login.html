@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Restaurant Management System</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="login-page">
+  <main class="container">
+    <section class="section section-login">
+      <div class="section-heading">
+        <span class="eyebrow">Authentication</span>
+        <h2>Login to your account</h2>
+        <p>Enter your username and password to access the restaurant management system.</p>
+        <p>Registered cashiers and managers can log in from this page.</p>
+      </div>
+
+      <div class="login-panel single-panel">
+        <div id="loginMessage" class="login-message" aria-live="polite">Use your credentials to sign in.</div>
+
+        <form id="loginForm" class="login-form" aria-label="Login form">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter username" required />
+
+          <div class="password-field">
+            <div class="password-label-row">
+              <label for="password">Password</label>
+            </div>
+            <div class="password-input-wrapper">
+              <input type="password" id="password" name="password" placeholder="Enter password" required />
+              <button type="button" id="togglePassword" class="password-toggle" aria-label="Toggle password visibility">👁</button>
+            </div>
+          </div>
+
+          <button type="submit" class="button-primary">Login</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Login page for Restaurant Management System.</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/login.js"></script>
+</body>
+</html>
