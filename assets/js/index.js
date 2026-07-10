@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE || 'http://localhost:4000';
+const API_BASE = window.API_BASE !== undefined ? window.API_BASE : (window.location.hostname === 'localhost' ? 'http://localhost:4000' : '');
 let items = [];
 let cart = [];
 let activeCategory = '';
