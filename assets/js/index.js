@@ -126,7 +126,7 @@ function renderProducts() {
   productContainer.innerHTML = '';
   filteredItems.forEach(item => {
     const col = document.createElement('div');
-    col.className = 'col-sm-6 col-lg-4';
+    col.className = 'col-12 col-md-6 col-lg-4';
 
     const status = getItemStatus(item.status, item.stock);
     const isOutOfStock = status === 'Out of stock' || status === 'Discontinued';
