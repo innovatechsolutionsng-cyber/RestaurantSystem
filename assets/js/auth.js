@@ -1,4 +1,5 @@
-const AUTH_API_BASE = window.API_BASE !== undefined ? window.API_BASE : (window.location.hostname === 'localhost' ? 'http://localhost:4000' : '');
+const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || window.location.hostname === '';
+const AUTH_API_BASE = window.API_BASE !== undefined ? window.API_BASE : (isLocalDevelopment ? 'http://localhost:4000' : '');
 let _refreshTimer = null;
 
 function getToken() {
