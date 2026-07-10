@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:4000";
+const API_BASE = window.API_BASE !== undefined ? window.API_BASE : (window.location.hostname === 'localhost' ? 'http://localhost:4000' : '');
 const managerSetupForm = document.getElementById("managerSetupForm");
 const setupMessage = document.getElementById("setupMessage");
 const setupStatusMessage = document.getElementById("setupStatusMessage");

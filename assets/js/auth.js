@@ -1,4 +1,4 @@
-const AUTH_API_BASE = window.API_BASE || "http://localhost:4000";
+const AUTH_API_BASE = window.API_BASE !== undefined ? window.API_BASE : (window.location.hostname === 'localhost' ? 'http://localhost:4000' : '');
 let _refreshTimer = null;
 
 function getToken() {
