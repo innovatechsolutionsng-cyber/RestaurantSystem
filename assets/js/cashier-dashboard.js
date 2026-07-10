@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE || "";
+const API_BASE = "http://localhost:4000";
 
 const salesValue = document.getElementById("salesValue");
 const pendingOrdersValue = document.getElementById("pendingOrdersValue");

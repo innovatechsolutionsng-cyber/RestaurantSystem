@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE || "";
+const API_BASE = "http://localhost:4000";
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 const togglePassword = document.getElementById("togglePassword");
