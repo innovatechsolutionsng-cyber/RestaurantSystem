@@ -5,6 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manager Dashboard</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    /* Report preview modal styles using project color accents */
+    .report-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2100;
+      padding: 2rem;
+    }
+    .report-modal-overlay.open, .report-modal-overlay.active { display: flex; }
+    .report-modal {
+      width: min(100%, 980px);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: 0 30px 80px rgba(2,6,23,0.35);
+      border: 1px solid rgba(37,99,235,0.08);
+      padding: 1rem 1.25rem;
+      color: #0f172a;
+    }
+    .report-modal .modal-header {
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0.5rem;
+    }
+    .report-modal .modal-title { font-size:1.25rem;font-weight:800;color: #0f4b80; }
+    .report-modal .report-meta { display:flex;gap:1rem;flex-wrap:wrap;color:#475569;font-size:0.95rem }
+    .report-preview {
+      background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(99,102,241,0.02));
+      border-radius: 10px; padding:1rem; margin-top:0.75rem; border:1px solid rgba(59,130,246,0.06);
+    }
+    .report-actions { display:flex;gap:0.5rem;align-items:center;margin-top:0.75rem }
+    .button-report-save { background: linear-gradient(90deg,#06b6d4,#0ea5e9); color:white; border:none; padding:0.6rem 0.9rem; border-radius:10px; font-weight:700 }
+    .button-report-download { background: linear-gradient(90deg,#84cc16,#16a34a); color:white; border:none; padding:0.6rem 0.9rem; border-radius:10px; font-weight:700 }
+    .button-report-cancel { background:transparent;border:1px solid rgba(15,23,42,0.08);padding:0.45rem 0.75rem;border-radius:8px }
+    .report-section { display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start }
+    .report-summary { padding:0.5rem }
+    .report-stats { background:white;padding:0.65rem;border-radius:8px;border:1px solid rgba(15,23,42,0.04) }
+    @media (max-width:720px){ .report-section{grid-template-columns:1fr} .report-modal{padding:0.75rem} }
+  </style>
 </head>
 <body class="dashboard-page">
   <div class="dashboard-shell">
@@ -39,6 +81,12 @@
             <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" ry="2"/><path d="M16 3v4"/><path d="M8 3v4"/></svg>
           </span>
           <span class="nav-text">Inventory</span>
+        </button>
+        <button class="nav-item" data-panel="delivery">
+          <span class="nav-icon">
+            <svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h13"/><path d="M9 6h8v8"/><path d="M5 10v10"/><path d="M20 20h-3"/><path d="M20 14h-3"/><path d="M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+          </span>
+          <span class="nav-text">Delivery</span>
         </button>
         <button class="nav-item" data-panel="sales">
           <span class="nav-icon">
@@ -403,7 +451,6 @@
                 <span>Role</span>
                 <select id="modalUserRole">
                   <option value="cashier">Cashier</option>
-                  <option value="manager">Manager</option>
                 </select>
               </label>
               <label class="form-field">
@@ -422,14 +469,43 @@
           </div>
         </div>
 
+        <section class="panel" data-panel="delivery">
+          <div class="section-heading section-heading-with-action">
+            <div>
+              <p class="section-subtitle">Delivery orders and status across the restaurant.</p>
+              <p class="panel-card-note">Track delivery ready orders, customer addresses, and delivery status from one place.</p>
+            </div>
+          </div>
+          <div class="delivery-panel">
+            <div class="panel-card">
+              <h3>Delivery overview</h3>
+              <p class="panel-card-note">Delivery orders will appear here once they are created or assigned.</p>
+            </div>
+            <div class="panel-card">
+              <h4>Delivery stats</h4>
+              <div class="delivery-metrics">
+                <div>
+                  <p class="metric-label">Open deliveries</p>
+                  <p id="deliveryOpenValue">0</p>
+                </div>
+                <div>
+                  <p class="metric-label">In transit</p>
+                  <p id="deliveryTransitValue">0</p>
+                </div>
+                <div>
+                  <p class="metric-label">Delivered</p>
+                  <p id="deliveryCompletedValue">0</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
         <section class="panel" data-panel="sales">
           <div class="section-heading section-heading-with-action">
             <div>
               <p class="section-subtitle">Review daily sales performance and revenue summary from across the restaurant.</p>
               <p class="panel-card-note">Use the filters to narrow down results by date, cashier, or order status.</p>
             </div>
-              
-          </div>
 
           <div class="sales-filter-row section-controls">
             <div class="filter-group">
@@ -844,21 +920,33 @@
             </div>
           </div>
           <!-- Report preview modal -->
-          <div id="reportPreviewModal" class="modal-overlay" aria-hidden="true">
-            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reportPreviewTitle">
+          <div id="reportPreviewModal" class="report-modal-overlay" aria-hidden="true">
+            <div class="report-modal" role="dialog" aria-modal="true" aria-labelledby="reportPreviewTitle">
               <div class="modal-header">
                 <div>
-                  <h3 id="reportPreviewTitle">Report preview</h3>
-                  <p id="reportPreviewSubtitle" class="modal-note">A summary of transactions for the selected day.</p>
+                  <h3 id="reportPreviewTitle" class="modal-title">Report preview</h3>
+                  <div id="reportPreviewSubtitle" class="report-meta">Summary of transactions for the selected date</div>
                 </div>
-                <button class="modal-close" type="button" aria-label="Close report preview">×</button>
+                <div class="report-actions">
+                  <button id="saveReportLocalBtn" type="button" class="button-report-save">Save report</button>
+                  <button id="downloadReportBtn" type="button" class="button-report-download">Download PDF</button>
+                  <button id="cancelReportBtn" type="button" class="button-report-cancel">Cancel</button>
+                </div>
               </div>
               <div class="modal-body" id="reportPreviewBody">
-                <!-- Filled dynamically -->
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="button-secondary modal-close">Close</button>
-                <button id="downloadReportBtn" type="button" class="button-primary">Download</button>
+                <div class="report-section">
+                  <div class="report-summary">
+                    <div class="report-preview" id="reportPreviewContent">
+                      <!-- dynamic report html inserted here -->
+                    </div>
+                  </div>
+                  <aside class="report-stats">
+                    <h4 style="margin-top:0">Quick stats</h4>
+                    <p><strong>Total sales:</strong> <span id="rpTotalSales">₦0.00</span></p>
+                    <p><strong>Orders:</strong> <span id="rpTotalOrders">0</span></p>
+                    <p><strong>Best seller:</strong> <span id="rpBestSeller">—</span></p>
+                  </aside>
+                </div>
               </div>
             </div>
           </div>

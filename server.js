@@ -598,15 +598,19 @@ app.get("/api/cashier/dashboard", verifyToken, async (req, res) => {
         o.payments,
         COALESCE((SELECT SUM(quantity) FROM order_items WHERE order_id = o.id), 0) AS items_count
       FROM orders o
+      WHERE o.cashier_id = ?
       ORDER BY o.created_at DESC
-      LIMIT 12`
+      LIMIT 12`,
+      [req.user.id]
     );
     const [summary] = await db.execute(
       `SELECT
         SUM(CASE WHEN status = 'completed' THEN total_amount ELSE 0 END) AS sales,
         SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending_orders,
         SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_orders
-      FROM orders`
+      FROM orders
+      WHERE cashier_id = ?`,
+      [req.user.id]
     );
 
     res.json({ summary: summary[0], orders });

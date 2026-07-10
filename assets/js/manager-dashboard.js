@@ -1083,18 +1083,53 @@ document.body.addEventListener('keydown', (ev) => {
   active.click();
 });
 
-downloadReportBtn?.addEventListener('click', () => {
-  // simple download: generate text content
-  const html = reportPreviewBody ? reportPreviewBody.innerText : 'Report';
-  const blob = new Blob([html], { type: 'text/plain' });
+// Modal interactions: click-outside-to-close, cancel, save JSON, and printable PDF
+reportPreviewModal?.addEventListener('click', (e) => {
+  if (e.target === reportPreviewModal) {
+    closeModal(reportPreviewModal);
+  }
+});
+
+document.getElementById('cancelReportBtn')?.addEventListener('click', () => closeModal(reportPreviewModal));
+
+document.getElementById('saveReportLocalBtn')?.addEventListener('click', () => {
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    date: (reportStartDateInput && reportStartDateInput.value) || new Date().toISOString().slice(0,10),
+    totalSales: (reportTodaysSalesValue && reportTodaysSalesValue.textContent) || '',
+    totalOrders: (reportTotalSalesCountValue && reportTotalSalesCountValue.textContent) || '',
+    bestSeller: (reportBestSellingItemValue && reportBestSellingItemValue.textContent) || '',
+    html: reportPreviewBody ? reportPreviewBody.innerHTML : '',
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `report-${(reportStartDateInput && reportStartDateInput.value) || new Date().toISOString().slice(0,10)}.txt`;
+  a.download = `report-${payload.date}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  showToast('Report saved locally');
+});
+
+downloadReportBtn?.addEventListener('click', () => {
+  const printable = `
+    <html><head><title>Report</title>
+    <style>body{font-family:Inter,system-ui,sans-serif;padding:20px;color:#0f172a}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #e6eef9}</style>
+    </head><body>
+    <h2>Report - ${(reportStartDateInput && reportStartDateInput.value) || new Date().toISOString().slice(0,10)}</h2>
+    <p><strong>Total sales:</strong> ${(reportTodaysSalesValue && reportTodaysSalesValue.textContent) || ''}</p>
+    <p><strong>Orders:</strong> ${(reportTotalSalesCountValue && reportTotalSalesCountValue.textContent) || ''}</p>
+    <div>${reportPreviewBody ? reportPreviewBody.innerHTML : ''}</div>
+    </body></html>
+  `;
+  const w = window.open('', '_blank');
+  if (!w) return showToast('Popup blocked. Allow popups to download the report.', 'error');
+  w.document.write(printable);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); w.close(); }, 600);
 });
 
 function showToast(message, type = 'success') {

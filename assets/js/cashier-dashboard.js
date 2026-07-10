@@ -399,28 +399,14 @@ function renderPaymentMethods() {
   methods.forEach(m => {
     const btn = document.createElement('button');
     btn.className = 'pos-method-btn';
+    if (currentPaymentMethod === m.id) btn.classList.add('active');
     btn.type = 'button';
     btn.dataset.method = m.id;
     const paidAmount = paymentAmounts[m.id] || 0;
     btn.innerHTML = `<span class="pos-method-icon">${m.icon}</span><span>${m.label}${paidAmount > 0 ? ` • ${formatCurrency(paidAmount)}` : ''}</span>`;
     if (paidAmount > 0) btn.classList.add('selected');
 
-    let clickTimer = null;
-    btn.addEventListener('click', () => {
-      if (clickTimer) return;
-      clickTimer = setTimeout(() => {
-        clickTimer = null;
-        handleMethodClick(m.id);
-      }, 250);
-    });
-    btn.addEventListener('dblclick', () => {
-      if (clickTimer) {
-        clearTimeout(clickTimer);
-        clickTimer = null;
-      }
-      handleMethodDoubleClick(m.id);
-    });
-
+    btn.addEventListener('click', () => selectPaymentMethod(m.id));
     posAvailableMethods.appendChild(btn);
   });
 
@@ -428,43 +414,23 @@ function renderPaymentMethods() {
   const helper = document.getElementById('posMethodHelper');
   if (label) {
     label.textContent = remainingAmount <= 0
-      ? 'Select a payment method.'
-      : 'Select payment method:';
+      ? 'Total payment recorded.'
+      : 'Select a payment method:';
   }
   if (helper) {
     helper.textContent = remainingAmount <= 0
-      ? 'All payment are recorded.'
+      ? 'Order is fully paid.'
       : hasPayments
-        ? 'Double-click a method to adjust amount or add another method.'
-        : 'Single-click to pay full total, or double-click to split payment.';
+        ? 'Click another method to change selection or adjust amounts.'
+        : 'Click a method to start payment.';
   }
 }
 
 function handleMethodClick(methodId) {
-  const paidTotal = Object.values(paymentAmounts).reduce((s, v) => s + v, 0);
-  const remainingAmount = Math.max(0, getCartSummary().total - paidTotal);
-
-  if (remainingAmount <= 0) {
-    showToast('Order is already fully paid.', 'error');
-    return;
-  }
-
-  if (Object.keys(paymentAmounts).length === 0 && !currentPaymentMethod) {
-    paymentAmounts[methodId] = remainingAmount;
-    currentPaymentMethod = methodId;
-    updatePaymentSummary();
-    renderPaymentMethods();
-    return;
-  }
-
-  handleMethodDoubleClick(methodId);
+  selectPaymentMethod(methodId);
 }
 
 function handleMethodDoubleClick(methodId) {
-  if (currentPaymentMethod && currentPaymentMethod !== methodId) {
-    if (!saveCurrentPaymentSelection()) return;
-  }
-
   selectPaymentMethod(methodId);
 }
 
@@ -474,13 +440,14 @@ function selectPaymentMethod(methodId) {
   const totalPaid = Object.values(paymentAmounts).reduce((s, v) => s + v, 0);
   const remainingAmount = Math.max(0, getCartSummary().total - (totalPaid - currentMethodAmount));
 
-  posMethodSelector.style.display = 'none';
+  posMethodSelector.style.display = 'grid';
   posPaymentInput.style.display = 'grid';
 
   const methodName = { 'Cash': 'Cash', 'Transfer': 'Transfer', 'Card': 'Card', 'Delivery': 'Delivery' }[methodId];
   posSelectedMethodLabel.textContent = `Amount for ${methodName}`;
   posPaymentAmount.value = currentMethodAmount > 0 ? currentMethodAmount.toFixed(2) : remainingAmount.toFixed(2);
   posPaymentAmount.focus();
+  renderPaymentMethods();
 }
 
 function saveCurrentPaymentSelection() {
@@ -521,6 +488,7 @@ function clearCurrentMethod() {
   posPaymentAmount.value = '';
   posPaymentInput.style.display = 'none';
   posMethodSelector.style.display = 'grid';
+  renderPaymentMethods();
 }
 
 function handleCheckout() {
