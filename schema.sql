@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE users MODIFY COLUMN role ENUM('manager', 'cashier', 'delivery') NOT NULL;
+
 CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   cashier_id INT NOT NULL,

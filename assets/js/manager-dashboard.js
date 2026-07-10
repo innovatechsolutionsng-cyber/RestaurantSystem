@@ -3,6 +3,7 @@ const revenueValue = document.getElementById("revenueValue");
 const openOrdersValue = document.getElementById("openOrdersValue");
 const cancelledOrdersValue = document.getElementById("cancelledOrdersValue");
 const ordersBody = document.getElementById("ordersBody");
+const deliveryOrdersBody = document.getElementById("deliveryOrdersBody");
 const salesRevenueValue = document.getElementById("salesRevenueValue");
 const salesOrderCountValue = document.getElementById("salesOrderCountValue");
 const salesCompletedCountValue = document.getElementById("salesCompletedCountValue");
@@ -105,6 +106,37 @@ async function loadDashboard() {
       `;
       ordersBody.appendChild(row);
     });
+
+    if (deliveryOrdersBody) {
+      const deliveryOrders = (data.orders || []).filter(order => String(order.status).toLowerCase() !== 'completed');
+      if (!deliveryOrders.length) {
+        deliveryOrdersBody.innerHTML = '<tr><td colspan="6" class="text-center muted-small">No active delivery orders found.</td></tr>';
+      } else {
+        deliveryOrdersBody.innerHTML = deliveryOrders.map(order => {
+          let customerName = 'Guest';
+          let phone = '—';
+          let address = '—';
+          try {
+            const payments = typeof order.payments === 'string' ? JSON.parse(order.payments) : order.payments || {};
+            customerName = payments.customerName || payments.customer || customerName;
+            phone = payments.customerPhone || payments.phone || phone;
+            address = payments.customerAddress || payments.address || address;
+          } catch (e) {
+            // ignore parse errors
+          }
+          return `
+            <tr>
+              <td>${order.id || '—'}</td>
+              <td>${customerName}</td>
+              <td>${phone}</td>
+              <td>${address}</td>
+              <td>${order.status || 'pending'}</td>
+              <td><button type="button" class="btn btn-sm btn-outline-secondary" disabled>View</button></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
 
     currentActiveCashierCount = Array.isArray(data.active_cashiers) ? data.active_cashiers.length : 0;
     updateSalesSectionMetrics(data.orders);
@@ -564,10 +596,12 @@ const saveSystemSettingsBtn = document.getElementById('saveSystemSettingsBtn');
 const businessNameInput = document.getElementById('businessNameInput');
 const businessAddressInput = document.getElementById('businessAddressInput');
 const businessPhoneInput = document.getElementById('businessPhoneInput');
+const businessWhatsappInput = document.getElementById('businessWhatsappInput');
 const businessEmailInput = document.getElementById('businessEmailInput');
 const receiptFooterInput = document.getElementById('receiptFooterInput');
 const taxRateInput = document.getElementById('taxRateInput');
 const defaultDiscountInput = document.getElementById('defaultDiscountInput');
+const packPriceInput = document.getElementById('packPriceInput');
 const currencyInput = document.getElementById('currencyInput');
 const timezoneInput = document.getElementById('systemTimezoneInput');
 const backupFrequencyInput = document.getElementById('systemBackupFrequencyInput');
@@ -663,7 +697,8 @@ function getOrderStatusBadge(status) {
 
 function getPaginationSize() {
   const settings = getStoredSettings();
-  const size = Number(settings.system?.paginationSize || 10);
+  const parsed = Number(String(settings.system?.paginationSize || '').replace(/[^\d-]/g, ''));
+  const size = Number.isFinite(parsed) ? parsed : 10;
   return Number.isInteger(size) && size > 0 ? size : 10;
 }
 
@@ -678,6 +713,7 @@ function loadStoredSettings() {
     if (businessNameInput) businessNameInput.value = stored.business.businessName || businessNameInput.value;
     if (businessAddressInput) businessAddressInput.value = stored.business.businessAddress || businessAddressInput.value;
     if (businessPhoneInput) businessPhoneInput.value = stored.business.businessPhone || businessPhoneInput.value;
+    if (businessWhatsappInput) businessWhatsappInput.value = stored.business.businessWhatsapp || stored.business.businessPhone || businessWhatsappInput.value;
     if (businessEmailInput) businessEmailInput.value = stored.business.businessEmail || businessEmailInput.value;
     if (receiptFooterInput) receiptFooterInput.value = stored.business.receiptFooter || receiptFooterInput.value;
   }
@@ -685,6 +721,7 @@ function loadStoredSettings() {
   if (stored.financial) {
     if (taxRateInput) taxRateInput.value = stored.financial.taxRate || taxRateInput.value;
     if (defaultDiscountInput) defaultDiscountInput.value = stored.financial.defaultDiscount || defaultDiscountInput.value;
+    if (packPriceInput) packPriceInput.value = stored.financial.packPrice ?? packPriceInput.value;
     if (currencyInput) currencyInput.value = stored.financial.currency || currencyInput.value;
   }
 
@@ -714,6 +751,7 @@ function saveBusinessSettings() {
     businessName: businessNameInput?.value || '',
     businessAddress: businessAddressInput?.value || '',
     businessPhone: businessPhoneInput?.value || '',
+    businessWhatsapp: businessWhatsappInput?.value || businessPhoneInput?.value || '',
     businessEmail: businessEmailInput?.value || '',
     receiptFooter: receiptFooterInput?.value || '',
   };
@@ -723,9 +761,11 @@ function saveBusinessSettings() {
 
 function saveFinancialSettings() {
   const current = getStoredSettings();
+  const packPriceValue = Number(String(packPriceInput?.value || '').replace(/[^\d.-]/g, ''));
   current.financial = {
     taxRate: taxRateInput?.value || '',
     defaultDiscount: defaultDiscountInput?.value || '',
+    packPrice: Number.isFinite(packPriceValue) ? packPriceValue : 0,
     currency: currencyInput?.value || 'NGN',
   };
   saveStoredSettings(current);

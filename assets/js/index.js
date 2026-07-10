@@ -26,6 +26,51 @@ const packContentAddItem = document.getElementById('packContentAddItem');
 const savePackBtn = document.getElementById('savePackBtn');
 const whatsappModal = document.getElementById('whatsappModal');
 
+function showToast(message, type = 'success') {
+  let toast = document.getElementById('toastContainer');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toastContainer';
+    toast.className = 'toast-container';
+    document.body.appendChild(toast);
+  }
+
+  const toastEl = document.createElement('div');
+  toastEl.className = `toast toast-${type}`;
+  toastEl.textContent = message;
+  toast.appendChild(toastEl);
+
+  setTimeout(() => toastEl.classList.add('show'), 10);
+  setTimeout(() => {
+    toastEl.classList.remove('show');
+    setTimeout(() => toastEl.remove(), 300);
+  }, 3000);
+}
+
+function resetCheckoutForm() {
+  const fields = ['customerName', 'customerPhone', 'customerAddress', 'diningOption'];
+  fields.forEach(id => {
+    const field = document.getElementById(id);
+    if (field) field.value = '';
+  });
+  const eatInFields = document.getElementById('eatInFields');
+  const takeOutFields = document.getElementById('takeOutFields');
+  if (eatInFields) eatInFields.style.display = 'none';
+  if (takeOutFields) takeOutFields.style.display = 'block';
+}
+
+function closeCheckoutModal() {
+  if (!whatsappModal) return;
+  if (window.bootstrap?.Modal) {
+    const instance = bootstrap.Modal.getInstance(whatsappModal) || new bootstrap.Modal(whatsappModal);
+    instance.hide();
+  } else {
+    whatsappModal.classList.remove('show');
+    whatsappModal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+  }
+}
+
 function saveState() {
   try {
     localStorage.setItem('rms_cart', JSON.stringify(cart));
@@ -59,8 +104,75 @@ function getCurrentCurrencySymbol() {
   return getStoredSettings().financial?.currency === 'USD' ? '$' : '₦';
 }
 
+function getBusinessWhatsAppNumber() {
+  const settings = getStoredSettings();
+  const rawNumber = settings.business?.businessWhatsapp || settings.business?.businessPhone || '';
+  const normalized = String(rawNumber || '').replace(/[^\d+]/g, '');
+  return normalized || '';
+}
+
+function getPackPriceSetting() {
+  const storedSettings = getStoredSettings();
+  const value = Number(String(storedSettings.financial?.packPrice || '').replace(/[^\d.-]/g, ''));
+  return Number.isFinite(value) ? value : 0;
+}
+
 function formatPrice(value) {
   return `${getCurrentCurrencySymbol()}${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function getPackContentsTotal(pack) {
+  return pack.contents.reduce((contentSum, content) => contentSum + Number(content.price || 0) * Number(content.quantity || 1), 0);
+}
+
+function getPackUnitTotal(pack) {
+  const configuredPackPrice = Number(pack.price ?? getPackPriceSetting());
+  const contentsTotal = getPackContentsTotal(pack);
+  return Number(configuredPackPrice > 0 ? configuredPackPrice : 0) + contentsTotal;
+}
+
+function getPackBasePrice(pack) {
+  const configuredPackPrice = Number(pack.price ?? getPackPriceSetting());
+  return Number.isFinite(configuredPackPrice) && configuredPackPrice > 0 ? configuredPackPrice : 0;
+}
+
+function getOrderBreakdownItems() {
+  const breakdown = cart.map(item => ({
+    id: item.id,
+    name: item.name,
+    quantity: Number(item.quantity || 1),
+    price: Number(item.price || 0),
+    type: 'product',
+  }));
+
+  packs.forEach(pack => {
+    const packQty = Number(pack.quantity || 1);
+    const packUnitTotal = getPackUnitTotal(pack);
+    breakdown.push({
+      id: null,
+      name: pack.name,
+      quantity: packQty,
+      price: packUnitTotal,
+      type: 'pack',
+      contents: pack.contents.map(content => ({
+        name: content.name,
+        quantity: Number(content.quantity || 1),
+        price: Number(content.price || 0),
+      })),
+    });
+
+    pack.contents.forEach(content => {
+      breakdown.push({
+        id: null,
+        name: `${content.name} (included in ${pack.name})`,
+        quantity: Number(content.quantity || 1) * packQty,
+        price: Number(content.price || 0),
+        type: 'pack-content',
+      });
+    });
+  });
+
+  return breakdown;
 }
 
 function getCategoryName(item) {
@@ -212,10 +324,12 @@ function addToCart(item, quantity = 1) {
 
 function addPack(pack) {
   const normalizedQuantity = Math.max(1, Number(pack.quantity) || 1);
+  const configuredPackPrice = getPackPriceSetting();
   packs.push({
     id: Date.now(),
     name: pack.name || `Pack ${packs.length + 1}`,
     quantity: normalizedQuantity,
+    price: Number(pack.price ?? configuredPackPrice),
     contents: pack.contents.map(content => ({ ...content }))
   });
   renderCart();
@@ -252,10 +366,7 @@ function updatePackQuantity(id, quantity) {
 
 function getCartTotal() {
   const cartTotal = cart.reduce((sum, item) => sum + Number(item.price || 0) * item.quantity, 0);
-  const packTotal = packs.reduce((sum, pack) => {
-    const packContentTotal = pack.contents.reduce((contentSum, content) => contentSum + Number(content.price || 0) * content.quantity, 0);
-    return sum + packContentTotal * pack.quantity;
-  }, 0);
+  const packTotal = packs.reduce((sum, pack) => sum + getPackUnitTotal(pack) * pack.quantity, 0);
   return cartTotal + packTotal;
 }
 
@@ -331,6 +442,7 @@ function renderCart() {
         <div class="flex-grow-1">
           <strong>${pack.name} <span class="muted-small">(pack)</span></strong>
           <div class="muted-small mt-1">Contains: ${pack.contents.map(c=>c.name).slice(0,3).join(', ')}${pack.contents.length>3? '...':''}</div>
+          <div class="muted-small mt-1 text-primary">Pack fee: ${formatPrice(getPackBasePrice(pack))}</div>
         </div>
         <div style="display:inline-flex; gap:6px; align-items:center;">
           <button class="btn btn-sm btn-outline-secondary edit-pack" data-id="${pack.id}" aria-label="Edit pack ${pack.name}" title="Edit" style="min-width: 38px; width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">✎</button>
@@ -347,7 +459,7 @@ function renderCart() {
             <button class="btn btn-outline-secondary" disabled style="min-width: 36px; width: 36px; height: 32px; padding: 0;">${pack.quantity}</button>
             <button class="btn btn-outline-secondary quantity-btn" data-action="increment" data-type="pack" data-id="${pack.id}" style="min-width: 32px; width: 32px; height: 32px; padding: 0;">+</button>
           </div>
-          <div class="fw-semibold text-primary">${formatPrice(pack.contents.reduce((s,c)=>s + Number(c.price||0) * c.quantity, 0) * pack.quantity)}</div>
+          <div class="fw-semibold text-primary">${formatPrice(getPackUnitTotal(pack) * pack.quantity)}</div>
         </div>
       </div>
     `;
@@ -437,11 +549,64 @@ sendToWhatsAppBtn?.addEventListener('click', () => {
 
 // build message and send to WhatsApp
 const confirmSendBtn = document.getElementById('confirmSendBtn');
-confirmSendBtn?.addEventListener('click', () => {
+confirmSendBtn?.addEventListener('click', async () => {
   const name = (document.getElementById('customerName')?.value || '').trim();
   const phone = (document.getElementById('customerPhone')?.value || '').trim();
   const address = (document.getElementById('customerAddress')?.value || '').trim();
   const dining = (document.getElementById('diningOption')?.value || 'takeout');
+
+  const orderItems = getOrderBreakdownItems();
+
+  try {
+    const response = await fetch(`${API_BASE}/api/public/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: orderItems,
+        subtotal: getCartTotal(),
+        tax: 0,
+        discount: 0,
+        total: getCartTotal(),
+        customerName: name,
+        customerPhone: phone,
+        customerAddress: address,
+        diningOption: dining,
+      }),
+    });
+
+    const createdOrder = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(createdOrder?.message || 'Unable to save public order.');
+    }
+
+    if (createdOrder?.orderId) {
+      localStorage.setItem('rms_latest_delivery_order', JSON.stringify({
+        id: createdOrder.orderId,
+        customerName: name,
+        customerPhone: phone,
+        customerAddress: address,
+        status: 'pending',
+        eta: 'Pending',
+        breakdown: orderItems.map(item => ({
+          name: item.name,
+          quantity: item.quantity || 1,
+          price: Number(item.price || 0),
+          type: item.type,
+        })),
+      }));
+    }
+
+    cart = [];
+    packs = [];
+    renderCart();
+    saveState();
+    resetCheckoutForm();
+    closeCheckoutModal();
+    showToast('Order sent successfully.');
+  } catch (error) {
+    console.error('Unable to save public order.', error);
+    showToast(error.message || 'Unable to save public order.', 'error');
+  }
 
   let lines = [];
   lines.push('New order from Restaurant Management System');
@@ -451,26 +616,23 @@ confirmSendBtn?.addEventListener('click', () => {
   lines.push(`Dining option: ${dining}`);
   lines.push('--- Order items ---');
 
-  cart.forEach(it => {
-    lines.push(`${it.name} x ${it.quantity} — ${formatPrice(Number(it.price || 0) * it.quantity)}`);
-  });
-
-  packs.forEach(p => {
-    lines.push(`${p.name} x ${p.quantity} (pack)`);
-    p.contents.forEach(c => {
-      lines.push(`  - ${c.name} x ${c.quantity} — ${formatPrice(Number(c.price || 0) * c.quantity)}`);
-    });
+  orderItems.forEach(item => {
+    if (item.type === 'pack-content') {
+      lines.push(`  - ${item.name} x ${item.quantity} — ${formatPrice(Number(item.price || 0) * item.quantity)}`);
+      return;
+    }
+    lines.push(`${item.name} x ${item.quantity} — ${formatPrice(Number(item.price || 0) * item.quantity)}`);
   });
 
   lines.push('---');
   lines.push(`Total: ${formatPrice(getCartTotal())}`);
 
   const msg = lines.join('\n');
-  const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  const waNumber = getBusinessWhatsAppNumber();
+  const url = waNumber
+    ? `https://wa.me/${waNumber.replace(/^\+/, '')}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
-  // close modal
-  const bs = bootstrap.Modal.getInstance(whatsappModal);
-  if (bs) bs.hide();
 });
 
 loadProducts();

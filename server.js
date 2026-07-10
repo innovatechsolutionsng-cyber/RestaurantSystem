@@ -101,6 +101,7 @@ async function initializeSchema() {
 async function ensureUserSchemaUpdates() {
   const [cols] = await db.execute("SHOW COLUMNS FROM users");
   const names = cols.map(col => col.Field);
+  const roleColumn = cols.find(col => col.Field === 'role');
 
   if (!names.includes('full_name')) {
     await db.execute("ALTER TABLE users ADD COLUMN full_name VARCHAR(128) DEFAULT ''");
@@ -110,6 +111,9 @@ async function ensureUserSchemaUpdates() {
   }
   if (!names.includes('last_seen')) {
     await db.execute("ALTER TABLE users ADD COLUMN last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+  }
+  if (!roleColumn || !String(roleColumn.Type).includes("'delivery'")) {
+    await db.execute("ALTER TABLE users MODIFY COLUMN role ENUM('manager', 'cashier', 'delivery') NOT NULL");
   }
 }
 
@@ -169,6 +173,11 @@ app.get("/manager-setup", (req, res) => {
 
 function createToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET || "supersecretkey", { expiresIn: "3h" });
+}
+
+function normalizeProductId(value) {
+  const numericValue = Number(value);
+  return Number.isInteger(numericValue) && numericValue > 0 && numericValue <= 2147483647 ? numericValue : null;
 }
 
 async function createRefreshToken(userId) {
@@ -302,7 +311,83 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 });
+app.get('/api/delivery/dashboard', verifyToken, async (req, res) => {
+  if (req.user.role !== 'delivery') {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
 
+  try {
+    const [orders] = await db.execute(
+      `SELECT
+        o.id,
+        o.status,
+        o.total_amount,
+        o.created_at,
+        o.payments,
+        COALESCE(u.full_name, u.username, 'Guest') AS cashier_name
+       FROM orders o
+       LEFT JOIN users u ON o.cashier_id = u.id
+       ORDER BY o.created_at DESC
+       LIMIT 20`
+    );
+
+    const summary = orders.reduce((acc, order) => {
+      const status = String(order.status || '').toLowerCase();
+      if (status === 'pending') acc.assigned += 1;
+      if (status === 'completed') {
+        acc.completed += 1;
+        acc.revenue += Number(order.total_amount || 0);
+      }
+      return acc;
+    }, { assigned: 0, inTransit: 0, completed: 0, revenue: 0 });
+
+    const formattedOrders = await Promise.all(orders.map(async (order) => {
+      let paymentData = {};
+      let customerName = 'Guest';
+      let customerPhone = '—';
+      let address = 'Address pending';
+      let eta = 'Pending';
+      let breakdown = [];
+
+      try {
+        paymentData = typeof order.payments === 'string' ? JSON.parse(order.payments) : order.payments || {};
+        customerName = paymentData.customerName || paymentData.customer || order.cashier_name || 'Guest';
+        customerPhone = paymentData.customerPhone || '—';
+        address = paymentData.customerAddress || paymentData.address || 'Address pending';
+        eta = paymentData.eta || 'Pending';
+        breakdown = Array.isArray(paymentData.orderItems) && paymentData.orderItems.length
+          ? paymentData.orderItems
+          : [];
+      } catch (error) {
+        // Ignore malformed payment JSON and fall back to defaults.
+      }
+
+      if (!breakdown.length) {
+        const [items] = await db.execute('SELECT name, quantity, price FROM order_items WHERE order_id = ?', [order.id]);
+        breakdown = items.map(item => ({
+          name: item.name,
+          quantity: item.quantity || 1,
+          price: item.price || 0,
+        }));
+      }
+
+      return {
+        id: order.id,
+        customerName,
+        customerPhone,
+        address,
+        status: order.status || 'pending',
+        eta,
+        breakdown,
+      };
+    }));
+
+    res.json({ summary, orders: formattedOrders });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Unable to load delivery dashboard data.' });
+  }
+});
 app.get("/api/manager/dashboard", verifyToken, async (req, res) => {
   if (req.user.role !== "manager") {
     return res.status(403).json({ message: "Forbidden" });
@@ -505,21 +590,47 @@ app.get('/api/public/products', async (req, res) => {
 });
 
 app.post('/api/public/orders', async (req, res) => {
-  const { items, subtotal, tax, discount, total } = req.body;
+  const {
+    items,
+    subtotal,
+    tax,
+    discount,
+    total,
+    customerName,
+    customerPhone,
+    customerAddress,
+    diningOption,
+    orderType,
+  } = req.body;
+
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Order must contain at least one item.' });
   }
 
   try {
+    const paymentPayload = {
+      customerName: customerName || '',
+      customerPhone: customerPhone || '',
+      customerAddress: customerAddress || '',
+      diningOption: diningOption || orderType || 'takeout',
+      orderItems: items.map(item => ({
+        name: item.name,
+        quantity: item.quantity || 1,
+        price: item.price || 0,
+        type: item.type || 'product',
+        contents: Array.isArray(item.contents) ? item.contents : undefined,
+      })),
+    };
+
     const [orderResult] = await db.execute(
       'INSERT INTO orders (cashier_id, subtotal, tax, discount, total_amount, payments, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [null, subtotal || 0, tax || 0, discount || 0, total || 0, JSON.stringify({}), 'pending']
+      [null, subtotal || 0, tax || 0, discount || 0, total || 0, JSON.stringify(paymentPayload), 'pending']
     );
 
     const orderId = orderResult.insertId;
     const insertItems = items.map(item => db.execute(
       'INSERT INTO order_items (order_id, product_id, name, quantity, price) VALUES (?, ?, ?, ?, ?)',
-      [orderId, item.id || null, item.name, item.quantity || 1, item.price || 0]
+      [orderId, normalizeProductId(item.id), item.name, item.quantity || 1, item.price || 0]
     ));
 
     await Promise.all(insertItems);
@@ -690,7 +801,7 @@ app.post('/api/cashier/orders', verifyToken, async (req, res) => {
     const orderId = orderResult.insertId;
     const insertItems = items.map(item => db.execute(
       'INSERT INTO order_items (order_id, product_id, name, quantity, price) VALUES (?, ?, ?, ?, ?)',
-      [orderId, item.id || null, item.name, item.quantity || 1, item.price || 0]
+      [orderId, normalizeProductId(item.id), item.name, item.quantity || 1, item.price || 0]
     ));
 
     await Promise.all(insertItems);
@@ -729,6 +840,73 @@ app.get('/api/cashier/orders/:id', verifyToken, async (req, res) => {
   }
 });
 
+app.put('/api/delivery/orders/:id/cancel', verifyToken, async (req, res) => {
+  if (req.user.role !== 'delivery') {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
+
+  const orderId = Number(req.params.id);
+  if (!orderId) {
+    return res.status(400).json({ message: 'Invalid order id.' });
+  }
+
+  try {
+    const [result] = await db.execute('UPDATE orders SET status = ? WHERE id = ? AND status <> ?', ['cancelled', orderId, 'cancelled']);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Order not found or already cancelled.' });
+    }
+    res.json({ message: 'Order cancelled successfully.', orderId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Unable to cancel order.' });
+  }
+});
+
+app.put('/api/delivery/orders/:id/payment', verifyToken, async (req, res) => {
+  if (req.user.role !== 'delivery') {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
+
+  const orderId = Number(req.params.id);
+  const { method } = req.body;
+  if (!orderId) {
+    return res.status(400).json({ message: 'Invalid order id.' });
+  }
+
+  if (!method || typeof method !== 'string') {
+    return res.status(400).json({ message: 'Payment method is required.' });
+  }
+
+  try {
+    const [orders] = await db.execute('SELECT payments, status FROM orders WHERE id = ?', [orderId]);
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+
+    const order = orders[0];
+    if (String(order.status).toLowerCase() === 'cancelled') {
+      return res.status(400).json({ message: 'Cannot process payment for a cancelled order.' });
+    }
+
+    let payments = {};
+    try {
+      payments = typeof order.payments === 'string' ? JSON.parse(order.payments) : order.payments || {};
+    } catch (e) {
+      payments = {};
+    }
+
+    payments.paymentStatus = 'completed';
+    payments.paymentMethod = method;
+    payments.receivedAt = new Date().toISOString();
+
+    await db.execute('UPDATE orders SET status = ?, payments = ? WHERE id = ?', ['completed', JSON.stringify(payments), orderId]);
+    res.json({ message: 'Payment processed successfully.', orderId, method });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Unable to process payment.' });
+  }
+});
+
 app.get('/api/manager/users', verifyToken, async (req, res) => {
   if (req.user.role !== 'manager') {
     return res.status(403).json({ message: 'Forbidden' });
@@ -761,6 +939,7 @@ app.post('/api/manager/users', verifyToken, async (req, res) => {
   }
 
   try {
+    await ensureUserSchemaUpdates();
     const [existing] = await db.execute('SELECT id FROM users WHERE username = ?', [username]);
     if (existing.length > 0) {
       return res.status(409).json({ message: 'Username already exists.' });
@@ -786,6 +965,7 @@ app.put('/api/manager/users/:id', verifyToken, async (req, res) => {
   const { full_name, username, role, status, password } = req.body;
 
   try {
+    await ensureUserSchemaUpdates();
     // check username conflict
     const [rowsExisting] = await db.execute('SELECT id, username, full_name, role, status FROM users WHERE id = ?', [userId]);
     if (rowsExisting.length === 0) return res.status(404).json({ message: 'User not found.' });

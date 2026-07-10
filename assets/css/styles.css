@@ -198,6 +198,68 @@ img {
   flex: 0 0 auto;
 }
 
+.delivery-order-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.delivery-order-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #274060;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 95px;
+  text-transform: capitalize;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.btn-outline-danger,
+.btn-outline-primary,
+.btn-outline-secondary {
+  border-width: 1px;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover {
+  opacity: 0.95;
+}
+
 .nav-link::after {
   content: "";
   position: absolute;
@@ -565,6 +627,18 @@ img {
   overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.user-table-wrapper .orders-table-wrapper {
+  max-height: none;
+  overflow: visible;
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+.user-table-wrapper .orders-table-wrapper table {
+  width: 100%;
+  min-width: 0;
 }
 
 .recent-transactions-table {

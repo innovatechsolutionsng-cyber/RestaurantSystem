@@ -483,6 +483,23 @@
               <h3>Delivery overview</h3>
               <p class="panel-card-note">Delivery orders will appear here once they are created or assigned.</p>
             </div>
+            <div class="panel-card" style="overflow-x:auto;">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="deliveryOrdersBody">
+                  <tr><td colspan="6" class="text-center muted-small">Loading delivery orders…</td></tr>
+                </tbody>
+              </table>
+            </div>
             <div class="panel-card">
               <h4>Delivery stats</h4>
               <div class="delivery-metrics">
@@ -827,6 +844,10 @@
                   <input id="businessPhoneInput" type="tel" value="+234 809 876 5432" />
                 </label>
                 <label class="form-field">
+                  <span>Business WhatsApp number</span>
+                  <input id="businessWhatsappInput" type="tel" value="+234 809 876 5432" />
+                </label>
+                <label class="form-field">
                   <span>Business email</span>
                   <input id="businessEmailInput" type="email" value="info@restaurant.com" />
                 </label>
@@ -858,6 +879,10 @@
                 <label class="form-field">
                   <span>Default discount</span>
                   <input id="defaultDiscountInput" type="text" value="0%" />
+                </label>
+                <label class="form-field">
+                  <span>Pack price</span>
+                  <input id="packPriceInput" type="number" min="0" step="0.01" value="0" placeholder="0.00" />
                 </label>
                 <label class="form-field">
                   <span>Currency</span>
