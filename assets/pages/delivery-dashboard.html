@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Delivery Dashboard | Restaurant Management System</title>
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+<body class="app-dashboard">
+  <header class="page-header">
+    <div class="container">
+      <div class="header-inner">
+        <h1>Delivery Dashboard</h1>
+        <nav class="nav">
+          <a href="/assets/pages/delivery-dashboard.html" class="nav-link">Dashboard</a>
+          <a href="#orders" class="nav-link">Orders</a>
+          <a href="#report" class="nav-link">Report</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <section id="overview" class="panel">
+      <div class="section-heading">
+        <h2>Overview</h2>
+        <p class="panel-card-note">Monitor delivery assignments, in-transit orders and completed deliveries.</p>
+      </div>
+      <div class="grid">
+        <div class="panel-card">
+          <h3>Assigned</h3>
+          <p id="assignedCount">0</p>
+        </div>
+        <div class="panel-card">
+          <h3>In Transit</h3>
+          <p id="inTransitCount">0</p>
+        </div>
+        <div class="panel-card">
+          <h3>Completed</h3>
+          <p id="completedCount">0</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="orders" class="panel mt-4">
+      <div class="section-heading">
+        <h2>Orders</h2>
+        <p class="panel-card-note">List of delivery orders assigned to drivers.</p>
+      </div>
+      <div id="deliveryOrdersList" class="panel-card">
+        <p class="muted-small">No delivery orders yet.</p>
+      </div>
+    </section>
+
+    <section id="report" class="panel mt-4">
+      <div class="section-heading">
+        <h2>Report</h2>
+        <p class="panel-card-note">Basic delivery performance report.</p>
+      </div>
+      <div class="panel-card">
+        <p class="muted-small">Reports will appear here.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/js/manager-dashboard.js"></script>
+</body>
+</html>

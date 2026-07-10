@@ -1700,7 +1700,7 @@ async function saveUser() {
     return;
   }
 
-  if (!['manager', 'cashier'].includes(role)) {
+  if (!['manager', 'cashier', 'delivery'].includes(role)) {
     showFormMessage(modalUserMessage, 'Select a valid role.', true);
     return;
   }

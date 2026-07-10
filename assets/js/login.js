@@ -44,6 +44,8 @@ loginForm.addEventListener("submit", async event => {
       window.location.href = "assets/pages/manager-dashboard.html";
     } else if (data.user.role === "cashier") {
       window.location.href = "assets/pages/cashier-dashboard.html";
+    } else if (data.user.role === "delivery") {
+      window.location.href = "assets/pages/delivery-dashboard.html";
     } else {
       showLoginMessage("Unauthorized role.", "warning");
     }

@@ -355,12 +355,17 @@
         </div>
       </div>
       <div class="col-lg-4">
-        <div class="cart-summary-card d-flex justify-content-between align-items-center">
-          <div>
-            <div class="small text-uppercase fw-bold text-primary">Order summary</div>
-            <div class="fw-bold text-dark">Ready for checkout</div>
+        <div class="cart-summary-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small text-uppercase fw-bold text-primary">Order summary</div>
+              <div class="fw-bold text-dark">Ready for checkout</div>
+            </div>
+            <div class="badge bg-primary-subtle text-primary fw-semibold" id="cartSummaryBadge">0 items</div>
           </div>
-          <div class="badge bg-primary-subtle text-primary fw-semibold" id="cartSummaryBadge">0 items</div>
+          <div class="d-grid gap-2 mt-3">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#packModal">Create pack</button>
+          </div>
         </div>
       </div>
     </div>
@@ -384,6 +389,44 @@
 
     <div id="productContainer" class="row g-3 text-center">
       <p id="loadingText" class="text-muted">Loading products...</p>
+    </div>
+
+    <div class="modal fade" id="packModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 shadow-lg border-0">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold text-primary">📦 Build a food pack</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-3">Select items and quantities to include in this pack. Each pack will appear as one cart entry.</p>
+            <div class="mb-3">
+              <label for="packName" class="form-label">Pack name</label>
+              <input id="packName" class="form-control rounded-pill shadow-sm" placeholder="e.g. Family feast" autocomplete="off">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Pack quantity</label>
+              <div class="input-group rounded-pill overflow-hidden border border-1 border-secondary">
+                <button type="button" class="btn btn-outline-secondary px-3" id="packQtyDecrement">−</button>
+                <input id="packQuantity" type="number" class="form-control border-0 text-center" value="1" min="1" aria-label="Pack quantity">
+                <button type="button" class="btn btn-outline-secondary px-3" id="packQtyIncrement">+</button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="fw-bold">Pack contents</div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="packContentAddItem">+ Add item</button>
+              </div>
+              <div id="packModalMessage" class="text-success small mb-2" style="display:none;"></div>
+              <div id="packItemsContainer" class="list-group"></div>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-success rounded-pill" id="savePackBtn">Add pack to cart</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="modal fade" id="choiceModal" tabindex="-1" aria-hidden="true">

@@ -17,9 +17,11 @@
       </div>
 
       <div class="login-panel single-panel">
-        <div id="loginMessage" class="login-message" aria-live="polite">Use your credentials to sign in.</div>
+        <div class="login-image-panel" aria-hidden="true"></div>
 
         <form id="loginForm" class="login-form" aria-label="Login form">
+          <div id="loginMessage" class="login-message" aria-live="polite">Use your credentials to sign in.</div>
+
           <label for="username">Username</label>
           <input type="text" id="username" name="username" placeholder="Enter username" required />
 
@@ -33,7 +35,10 @@
             </div>
           </div>
 
-          <button type="submit" class="button-primary">Login</button>
+          <button type="submit" class="button-primary">
+            <span class="button-icon" aria-hidden="true">🍽️</span>
+            <span>Login</span>
+          </button>
         </form>
       </div>
     </section>

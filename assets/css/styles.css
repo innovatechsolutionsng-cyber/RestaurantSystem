@@ -176,6 +176,9 @@ img {
 }
 
 .section {
+  padding: 4rem 0;
+}
+
 .payment-method-chip {
   max-width: 140px;
   white-space: nowrap;
@@ -194,10 +197,16 @@ img {
 .orders-table .payment-method-chip .payment-method-icon {
   flex: 0 0 auto;
 }
-  padding: 4rem 0;
-}
 
 .nav-link::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  width: 0;
+  background: #ffd166;
+  transition: width 180ms ease;
+}
 
 /* colored action buttons for category cards */
 .category-action-btn[data-action="edit"] {
@@ -216,8 +225,7 @@ img {
 .category-action-btn[data-action="delete"]:hover {
   background: rgba(254, 202, 202, 0.95);
 }
-  content: "";
-  position: absolute;
+
   inset: auto 0 0;
   height: 2px;
   width: 0;
@@ -1426,7 +1434,7 @@ img {
   margin-top: 1rem;
 }
 
-.category-action-btn {
+.category-card-actions .category-action-btn {
   appearance: none;
   border: 1px solid rgba(15, 23, 42, 0.12);
   background: #ffffff;
@@ -1438,17 +1446,39 @@ img {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
 }
 
-.category-action-btn:hover,
-.category-action-btn:focus-visible {
+.category-card-actions .category-action-btn:hover,
+.category-card-actions .category-action-btn:focus-visible {
   transform: translateY(-1px);
   border-color: rgba(37, 99, 235, 0.35);
   background: #eff6ff;
 }
 
-.category-action-btn svg {
+.category-card-actions .category-action-btn[data-action="edit"] {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.28);
+  color: #1d4ed8;
+}
+
+.category-card-actions .category-action-btn[data-action="edit"]:hover,
+.category-card-actions .category-action-btn[data-action="edit"]:focus-visible {
+  background: rgba(59, 130, 246, 0.18);
+}
+
+.category-card-actions .category-action-btn[data-action="delete"] {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #dc2626;
+}
+
+.category-card-actions .category-action-btn[data-action="delete"]:hover,
+.category-card-actions .category-action-btn[data-action="delete"]:focus-visible {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.category-card-actions .category-action-btn svg {
   width: 16px;
   height: 16px;
 }
@@ -2259,7 +2289,7 @@ img {
 
 .section-login .login-panel {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.1fr 1fr;
   gap: 2rem;
   align-items: stretch;
   background: rgba(255, 255, 255, 0.55);
@@ -2270,28 +2300,45 @@ img {
   padding: 2.5rem;
 }
 
+.login-image-panel {
+  min-height: 420px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(99, 102, 241, 0.08)), url('assets/images/login-side-image.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-image-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.14), rgba(15, 23, 42, 0.02));
+}
+
 .login-message {
-  display: grid;
-  place-items: start;
-  min-height: 240px;
-  padding: 2rem;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  color: #1d2f54;
+  display: block;
+  width: 100%;
+  padding: 1rem 1.15rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  color: #0f172a;
   font-weight: 600;
   text-align: left;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+  box-shadow: 0 10px 24px rgba(15, 34, 85, 0.06);
+  margin-bottom: 0.5rem;
 }
 
 .login-form {
   display: grid;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.98);
   border-radius: 28px;
   padding: 2.25rem;
   box-shadow: 0 18px 50px rgba(20, 44, 89, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 .login-form label {
@@ -2336,32 +2383,80 @@ img {
   padding: 0.3rem;
 }
 
-.password-toggle:focus-visible {
-  outline: 2px solid rgba(13, 62, 149, 0.35);
-  outline-offset: 4px;
+@media (max-width: 780px) {
+  .section-login .login-panel {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+
+  .login-image-panel {
+    min-height: 180px;
+    border-radius: 22px;
+  }
+
+  .login-form {
+    padding: 1.75rem;
+  }
+
+  .login-message {
+    min-height: auto;
+    margin-bottom: 1rem;
+    font-size: 0.96rem;
+  }
+
+  .login-form label {
+    font-size: 0.95rem;
+  }
+
+  .login-form input,
+  .login-form select {
+    padding: 0.9rem 0.95rem;
+  }
+
+  .button-primary {
+    width: 100%;
+    padding: 0.95rem 1rem;
+  }
 }
 
 .button-primary {
   appearance: none;
   border: none;
-  background: #0d3f95;
-  color: white;
-  border-radius: 14px;
-  padding: 1rem 1.2rem;
+  width: 100%;
+  padding: 1rem 1.15rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2563eb, #0f4cc9);
+  color: #ffffff;
   font-size: 1rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
   cursor: pointer;
-  transition: transform 160ms ease, background 160ms ease, opacity 160ms ease;
-}
+  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.18);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+  }
 
-.button-primary:hover,
-.button-primary:focus-visible {
-  background: #162f7a;
-  transform: translateY(-1px);
-}
+  .button-primary .button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    font-size: 1rem;
+    line-height: 1;
+  }
 
-.button-primary:disabled,
-.button-secondary:disabled {
+.button-primary:hover .button-icon,
+.button-primary:focus-visible .button-icon {
+  background: rgba(255, 255, 255, 0.24);
+}
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;

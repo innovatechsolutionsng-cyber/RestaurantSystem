@@ -25,7 +25,7 @@ async function ensureDatabaseTables() {
     username VARCHAR(64) NOT NULL UNIQUE,
     full_name VARCHAR(128) DEFAULT '',
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('manager', 'cashier') NOT NULL,
+    role ENUM('manager', 'cashier', 'delivery') NOT NULL,
     status ENUM('Active', 'Inactive') NOT NULL DEFAULT 'Active',
     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -752,8 +752,7 @@ app.post('/api/manager/users', verifyToken, async (req, res) => {
   if (!full_name || !username || !password || !role || !status) {
     return res.status(400).json({ message: 'Full name, username, password, role, and status are required.' });
   }
-
-  if (!['manager', 'cashier'].includes(role)) {
+  if (!['manager', 'cashier', 'delivery'].includes(role)) {
     return res.status(400).json({ message: 'Invalid role selected.' });
   }
 
@@ -799,7 +798,7 @@ app.put('/api/manager/users/:id', verifyToken, async (req, res) => {
     const newStatus = typeof status !== 'undefined' ? status : existingUser.status;
 
     if (!newFullName || !newUsername) return res.status(400).json({ message: 'Full name and username are required.' });
-    if (!['manager', 'cashier'].includes(newRole)) return res.status(400).json({ message: 'Invalid role selected.' });
+    if (!['manager', 'cashier', 'delivery'].includes(newRole)) return res.status(400).json({ message: 'Invalid role selected.' });
     if (!['Active', 'Inactive'].includes(newStatus)) return res.status(400).json({ message: 'Invalid status selected.' });
 
     const [existing] = await db.execute('SELECT id FROM users WHERE username = ? AND id <> ?', [newUsername, userId]);
