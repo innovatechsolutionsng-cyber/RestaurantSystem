@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE || 'http://localhost:4000';
+const API_BASE = "";
 let items = [];
 let cart = [];
 let activeCategory = '';
@@ -276,7 +276,7 @@ async function loadProducts() {
   if (loadingText) loadingText.textContent = 'Loading products...';
 
   try {
-    const response = await fetch(`${API_BASE}/api/public/products`);
+    const response = await fetch("/api/public/products");
     if (!response.ok) {
       throw new Error('Unable to fetch products');
     }
