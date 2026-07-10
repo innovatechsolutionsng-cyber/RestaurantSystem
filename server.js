@@ -73,6 +73,13 @@ async function ensureDatabaseTables() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
   )`);
+  await db.execute(`CREATE TABLE IF NOT EXISTS refresh_tokens (
+    token VARCHAR(512) PRIMARY KEY,
+    user_id INT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )`);
 }
 
 // Initialize schema on background without blocking server startup
@@ -141,7 +148,7 @@ async function ensureOrderSchemaUpdates() {
 // Start schema initialization in background (non-blocking)
 initializeSchema();
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "assets")));
@@ -164,6 +171,33 @@ function createToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET || "supersecretkey", { expiresIn: "3h" });
 }
 
+async function createRefreshToken(userId) {
+  const token = jwt.sign({ id: userId }, process.env.JWT_SECRET || "supersecretkey", { expiresIn: '30d' });
+  await db.execute("INSERT INTO refresh_tokens (token, user_id, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY))", [token, userId]);
+  return token;
+}
+
+async function revokeRefreshToken(token) {
+  try { await db.execute("DELETE FROM refresh_tokens WHERE token = ?", [token]); } catch (e) { }
+}
+
+async function findRefreshToken(token) {
+  try {
+    const [rows] = await db.execute("SELECT token, user_id, expires_at FROM refresh_tokens WHERE token = ?", [token]);
+    return rows && rows.length ? rows[0] : null;
+  } catch (e) { return null; }
+}
+
+function getCookieFromHeader(req, name) {
+  const header = req.headers && req.headers.cookie;
+  if (!header) return null;
+  const parts = header.split(';').map(p => p.trim());
+  for (const p of parts) {
+    if (p.startsWith(name + '=')) return decodeURIComponent(p.slice(name.length + 1));
+  }
+  return null;
+}
+
 async function verifyToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -179,7 +213,12 @@ async function verifyToken(req, res, next) {
     req.user = { id: dbUser.id, username: dbUser.username, role: dbUser.role };
     next();
   } catch (err) {
-    console.error('verifyToken error:', err && err.message ? err.message : err);
+    const msg = err && err.message ? err.message : String(err);
+    console.error('verifyToken error:', msg);
+    // If the token is expired, return 401 so clients can detect expiry specifically
+    if (err && err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'TokenExpired', error: msg });
+    }
     return res.status(403).json({ message: 'Forbidden' });
   }
 }
@@ -245,6 +284,18 @@ app.post("/api/login", async (req, res) => {
     await db.execute('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
 
     const token = createToken({ id: user.id, username: user.username, role: user.role });
+    // create refresh token and set as httpOnly cookie
+    try {
+      const refresh = await createRefreshToken(user.id);
+      res.cookie('rms_refresh', refresh, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
+    } catch (e) {
+      console.error('Unable to create refresh token:', e);
+    }
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
     console.error(error);
@@ -827,13 +878,54 @@ app.get("/api/auth/status", verifyToken, (req, res) => {
 });
 
 // Refresh JWT token
-app.post('/api/auth/refresh', verifyToken, (req, res) => {
+app.post('/api/auth/refresh', async (req, res) => {
   try {
-    const token = createToken({ id: req.user.id, username: req.user.username, role: req.user.role });
-    res.json({ token });
+    const incoming = req.body && req.body.refreshToken ? req.body.refreshToken : null;
+    const cookieToken = getCookieFromHeader(req, 'rms_refresh');
+    const token = incoming || cookieToken;
+    if (!token) return res.status(401).json({ message: 'No refresh token provided' });
+
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey");
+    } catch (err) {
+      console.error('refresh verify error:', err && err.message ? err.message : err);
+      await revokeRefreshToken(token).catch(()=>{});
+      return res.status(401).json({ message: 'Invalid refresh token' });
+    }
+
+    const stored = await findRefreshToken(token);
+    if (!stored) return res.status(401).json({ message: 'Refresh token not found' });
+
+    const newAccess = createToken({ id: payload.id, username: payload.username || '', role: payload.role || '' });
+    await revokeRefreshToken(token).catch(()=>{});
+    const newRefresh = await createRefreshToken(payload.id);
+
+    res.cookie('rms_refresh', newRefresh, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ token: newAccess });
   } catch (error) {
     console.error('Unable to refresh token:', error);
     res.status(500).json({ message: 'Unable to refresh token.' });
+  }
+});
+
+app.post('/api/auth/logout', async (req, res) => {
+  try {
+    const cookieToken = getCookieFromHeader(req, 'rms_refresh');
+    const incoming = req.body && req.body.refreshToken ? req.body.refreshToken : null;
+    const token = incoming || cookieToken;
+    if (token) await revokeRefreshToken(token).catch(()=>{});
+    res.clearCookie('rms_refresh');
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).json({ message: 'Unable to logout' });
   }
 });
 

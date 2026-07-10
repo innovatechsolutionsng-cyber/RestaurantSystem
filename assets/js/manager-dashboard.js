@@ -154,14 +154,43 @@ function getReportRange() {
   };
 }
 
+function getDateKey(dateValue) {
+  if (!dateValue) return null;
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString().slice(0, 10);
+}
+
+function getReportDateKey() {
+  const value = reportStartDateInput?.value;
+  if (value) return value;
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getLatestAvailableDateKey(items = []) {
+  const keys = Array.from(new Set((items || [])
+    .map(item => getDateKey(item && item.created_at))
+    .filter(Boolean)))
+    .sort();
+  return keys[keys.length - 1] || null;
+}
+
+function resolveReportDateKey(items = []) {
+  const requestedDateKey = getReportDateKey();
+  const availableDateKey = getLatestAvailableDateKey(items);
+  if (!availableDateKey) return requestedDateKey;
+  const hasRequestedData = (items || []).some(item => getDateKey(item && item.created_at) === requestedDateKey);
+  return hasRequestedData ? requestedDateKey : availableDateKey;
+}
+
 function isInReportRange(dateValue) {
   const range = getReportRange();
-  // if no startDate filter is set, include everything
   if (!range.startDate) return true;
-  // when a startDate is set, exclude records missing a valid date
   if (!dateValue) return false;
-  const date = new Date(dateValue);
-  return date >= range.startDate;
+  const dateKey = getDateKey(dateValue);
+  if (!dateKey) return false;
+  const rangeKey = getDateKey(range.startDate);
+  return rangeKey ? dateKey >= rangeKey : false;
 }
 
 function getFilteredReportOrders() {
@@ -258,17 +287,22 @@ function renderTopProductsChart(items) {
       <span class="report-chart-title">Top products</span>
       <span class="report-chart-subtitle">Best-selling items by quantity</span>
     </div>
-    <div class="report-chart-data">
-      ${topProducts.map(item => {
+    <div class="report-product-showcase">
+      ${topProducts.map((item, index) => {
         const width = Math.round((item.quantity / maxQuantity) * 100);
+        const rank = index + 1;
         return `
-          <div class="report-product-row">
-            <div class="report-product-meta">
-              <span class="report-product-title">${item.name}</span>
-              <span class="report-product-count">${formatNumber(item.quantity)} sold</span>
+          <div class="report-product-card report-product-card--${rank === 1 ? 'top' : rank === 2 ? 'second' : 'other'}">
+            <div class="report-product-card-head">
+              <span class="report-product-rank">#${rank}</span>
+              <span class="report-product-pill">${formatNumber(item.quantity)} sold</span>
             </div>
-            <div class="report-product-bar-wrapper">
-              <div class="report-product-bar" style="width: 0%; --target-width: ${width}%;"></div>
+            <div class="report-product-card-body">
+              <h4>${item.name}</h4>
+              <p>${formatNumber(item.quantity)} units moved • ${width}% of the top volume</p>
+              <div class="report-product-bar-wrapper">
+                <div class="report-product-bar" style="width: 0%; --target-width: ${width}%;"></div>
+              </div>
             </div>
           </div>
         `;
@@ -308,45 +342,44 @@ function formatISODate(date) {
 
 function setDefaultReportDates() {
   const today = new Date();
-  const oneWeekAgo = new Date(today);
-  oneWeekAgo.setDate(today.getDate() - 7);
-  // prefer persisted start date for reports
   const stored = localStorage.getItem('rms_report_startDate');
   if (reportStartDateInput) {
     if (stored) {
       reportStartDateInput.value = stored;
     } else if (!reportStartDateInput.value) {
-      reportStartDateInput.value = formatISODate(oneWeekAgo);
+      reportStartDateInput.value = formatISODate(today);
     }
   }
 }
 
 function renderReportSection() {
-  if (!reportTodaysSalesValue || !reportTotalSalesCountValue || !reportBestSellingItemValue) return;
+  if (!reportTodaysSalesValue || !reportTotalSalesCountValue || !reportCancelledOrdersValue || !reportBestSellingItemValue) return;
 
-  const filteredOrders = getFilteredReportOrders();
-  const filteredItems = getFilteredReportItems();
+  const selectedDateKey = resolveReportDateKey(salesOrders);
+  if (reportStartDateInput && reportStartDateInput.value !== selectedDateKey) {
+    reportStartDateInput.value = selectedDateKey;
+  }
 
-  // metrics should reflect only the selected day (or today if none selected)
-  const selectedDateKey = (reportStartDateInput && reportStartDateInput.value) ? reportStartDateInput.value : new Date().toISOString().slice(0, 10);
-
-  const dailyOrders = salesOrders.filter(order => {
+  const dailyOrders = (salesOrders || []).filter(order => {
     if (!order || !order.created_at) return false;
-    const orderKey = new Date(order.created_at).toISOString().slice(0, 10);
-    return orderKey === selectedDateKey && String(order.status || '').toLowerCase() === 'completed';
+    return getDateKey(order.created_at) === selectedDateKey;
   });
-  const dailySales = dailyOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
+  const dailyCompletedOrders = dailyOrders.filter(order => String(order.status || '').toLowerCase() === 'completed');
+  const dailyCancelledOrders = dailyOrders.filter(order => String(order.status || '').toLowerCase() === 'cancelled');
+  const dailySales = dailyCompletedOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
 
   reportTodaysSalesValue.textContent = formatCurrency(dailySales);
   reportTotalSalesCountValue.textContent = formatNumber(dailyOrders.length);
+  reportCancelledOrdersValue.textContent = formatNumber(dailyCancelledOrders.length);
 
-  const dailyItems = orderItems.filter(item => {
+  const dailyItems = (orderItems || []).filter(item => {
     if (!item || !item.created_at) return false;
-    return new Date(item.created_at).toISOString().slice(0, 10) === selectedDateKey;
+    return getDateKey(item.created_at) === selectedDateKey;
   });
   reportBestSellingItemValue.textContent = getBestSellingItem(dailyItems);
 
-  // charts and staff table remain range-based
+  const filteredOrders = dailyOrders;
+  const filteredItems = dailyItems;
   renderDailySalesTrendChart(filteredOrders);
   renderTopProductsChart(filteredItems);
   renderStaffPerformanceTable();
@@ -561,6 +594,7 @@ const reportStartDateInput = document.getElementById('reportStartDateInput');
 const saveReportBtn = document.getElementById('saveReportBtn');
 const reportTodaysSalesValue = document.getElementById('reportTodaysSalesValue');
 const reportTotalSalesCountValue = document.getElementById('reportTotalSalesCountValue');
+const reportCancelledOrdersValue = document.getElementById('reportCancelledOrdersValue');
 const reportBestSellingItemValue = document.getElementById('reportBestSellingItemValue');
 const reportDailySalesTrendEl = document.getElementById('reportDailySalesTrend');
 const reportTopProductsChartEl = document.getElementById('reportTopProductsChart');

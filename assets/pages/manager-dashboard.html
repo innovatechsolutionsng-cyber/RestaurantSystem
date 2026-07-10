@@ -501,94 +501,97 @@
           </div>
         </section>
         <section class="panel" data-panel="sales">
-          <div class="section-heading section-heading-with-action">
-            <div>
-              <p class="section-subtitle">Review daily sales performance and revenue summary from across the restaurant.</p>
-              <p class="panel-card-note">Use the filters to narrow down results by date, cashier, or order status.</p>
+          <div class="sales-section-shell panel-surface">
+            <div class="section-heading section-heading-with-action sales-section-header">
+              <div>
+                <p class="section-subtitle">Review daily sales performance and revenue summary from across the restaurant.</p>
+                <p class="panel-card-note">Use the filters to narrow down results by date, cashier, or order status.</p>
+              </div>
             </div>
 
-          <div class="sales-filter-row section-controls">
-            <div class="filter-group">
-              <label class="form-field">
-                <span>From</span>
-                <input id="salesStartDateInput" type="date" />
-              </label>
+            <div class="sales-filter-row section-controls">
+              <div class="filter-group">
+                <label class="form-field">
+                  <span>From</span>
+                  <input id="salesStartDateInput" type="date" />
+                </label>
+              </div>
+              <div class="filter-group">
+                <label class="form-field">
+                  <span>To</span>
+                  <input id="salesEndDateInput" type="date" />
+                </label>
+              </div>
+              <div class="filter-group">
+                <label class="form-field">
+                  <span>Cashier</span>
+                  <select id="salesCashierFilter">
+                    <option value="all">All cashiers</option>
+                  </select>
+                </label>
+              </div>
+              <div class="filter-group">
+                <label class="form-field">
+                  <span>Status</span>
+                  <select id="salesStatusFilter">
+                    <option value="all">All statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="voided">Voided</option>
+                  </select>
+                </label>
+              </div>
             </div>
-            <div class="filter-group">
-              <label class="form-field">
-                <span>To</span>
-                <input id="salesEndDateInput" type="date" />
-              </label>
-            </div>
-            <div class="filter-group">
-              <label class="form-field">
-                <span>Cashier</span>
-                <select id="salesCashierFilter">
-                  <option value="all">All cashiers</option>
-                </select>
-              </label>
-            </div>
-            <div class="filter-group">
-              <label class="form-field">
-                <span>Status</span>
-                <select id="salesStatusFilter">
-                  <option value="all">All statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="voided">Voided</option>
-                </select>
-              </label>
-            </div>
-          </div>
 
-          <div class="panel-grid sales-metrics-grid">
-            <article class="panel-card">
-              <h3>Total sales</h3>
-              <p id="salesTotalValue">₦0.00</p>
-              <p class="metric-note muted-small">Sum of recent order totals used for this sales summary.</p>
-            </article>
-            <article class="panel-card">
-              <h3>Total items</h3>
-              <p id="salesItemsValue">0</p>
-              <p class="metric-note muted-small">Total quantity of items sold across the displayed orders.</p>
-            </article>
-            <article class="panel-card">
-              <h3>Voided items</h3>
-              <p id="salesVoidedValue">0</p>
-              <p class="metric-note muted-small">Count of orders marked as voided in the displayed sales.</p>
-            </article>
-            <article class="panel-card">
-              <h3>Cancelled orders</h3>
-              <p id="salesCancelledValue">0</p>
-              <p class="metric-note muted-small">Count of orders canceled in the displayed sales.</p>
-            </article>
-          </div>
+            <div class="panel-grid sales-metrics-grid">
+              <article class="panel-card">
+                <h3>Total sales</h3>
+                <p id="salesTotalValue">₦0.00</p>
+                <p class="metric-note muted-small">Sum of recent order totals used for this sales summary.</p>
+              </article>
+              <article class="panel-card">
+                <h3>Total items</h3>
+                <p id="salesItemsValue">0</p>
+                <p class="metric-note muted-small">Total quantity of items sold across the displayed orders.</p>
+              </article>
+              <article class="panel-card">
+                <h3>Voided items</h3>
+                <p id="salesVoidedValue">0</p>
+                <p class="metric-note muted-small">Count of orders marked as voided in the displayed sales.</p>
+              </article>
+              <article class="panel-card">
+                <h3>Cancelled orders</h3>
+                <p id="salesCancelledValue">0</p>
+                <p class="metric-note muted-small">Count of orders canceled in the displayed sales.</p>
+              </article>
+            </div>
 
-          <div class="panel-card sales-table-wrapper">
-            <div class="section-heading">
-              <p class="section-subtitle">Sales history</p>
-            </div>
-            <div class="orders-table-wrapper">
-              <table class="orders-table sales-table">
-                <thead>
-                  <tr>
-                    <th>Date/Time</th>
-                    <th>Order ID</th>
-                    <th>Cashier</th>
-                    <th>Items</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="salesTableBody"></tbody>
-              </table>
-            </div>
-            <div id="salesPagination" class="pagination-controls" style="display: none;">
-              <button type="button" class="pagination-btn pagination-prev" id="salesPrevBtn">← Previous</button>
-              <span id="salesPageInfo" class="pagination-info"></span>
-              <button type="button" class="pagination-btn pagination-next" id="salesNextBtn">Next →</button>
+            <div class="panel-card sales-table-wrapper">
+              <div class="section-heading">
+                <p class="section-subtitle">Sales history</p>
+              </div>
+              <div class="orders-table-wrapper">
+                <table class="orders-table sales-table">
+                  <thead>
+                    <tr>
+                      <th>Date/Time</th>
+                      <th>Order ID</th>
+                      <th>Cashier</th>
+                      <th>Items</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="salesTableBody"></tbody>
+                </table>
+              </div>
+              <div id="salesPagination" class="pagination-controls" style="display: none;">
+                <button type="button" class="pagination-btn pagination-prev" id="salesPrevBtn">← Previous</button>
+                <span id="salesPageInfo" class="pagination-info"></span>
+                <button type="button" class="pagination-btn pagination-next" id="salesNextBtn">Next →</button>
+              </div>
             </div>
           </div>
         </section>
@@ -671,9 +674,14 @@
               <p class="metric-note muted-small">Completed sales recorded today.</p>
             </article>
             <article class="panel-card">
-              <h3>Total sales</h3>
+              <h3>Total orders</h3>
               <p id="reportTotalSalesCountValue">0</p>
               <p class="metric-note muted-small">Number of orders in the selected report range.</p>
+            </article>
+            <article class="panel-card">
+              <h3>Cancelled orders</h3>
+              <p id="reportCancelledOrdersValue">0</p>
+              <p class="metric-note muted-small">Cancelled orders recorded for the selected day.</p>
             </article>
             <article class="panel-card">
               <h3>Best selling item</h3>

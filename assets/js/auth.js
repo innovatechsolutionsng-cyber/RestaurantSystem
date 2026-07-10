@@ -46,9 +46,11 @@ async function refreshToken() {
   const token = getToken();
   if (!token) return;
   try {
+    // refresh token is sent via httpOnly cookie; include credentials
     const resp = await fetch(`${AUTH_API_BASE}/api/auth/refresh`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
     });
     if (!resp.ok) {
       // clear token and force re-login
